@@ -1,0 +1,35 @@
+Package: rmRNAseq
+Type: Package
+Title: RNA-seq Analysis for Repeated-measures Data
+Version: 0.1.0
+Author: Yet Nguyen <tienyettoan@gmail.com>
+Maintainer: Yet Nguyen <tienyettoan@gmail.com>
+Description: This package implement parametric bootstrap inference method to identify differentially expressed genes using RNA-seq data. The method is using voom-limma differential expression analysis method.
+Depends: R (>= 3.3)
+Imports:
+    AUC (>= 0.3.0),
+    edgeR (>= 3.16.5),
+    DESeq2,
+    ggplot2 (>= 2.2.1),
+    graphics,
+    limma (>= 3.30.13),
+    MASS (>= 7.3-45),
+    Matrix (>= 1.2-8), 
+    nlme (>= 3.1-131),
+    parallel,
+    reshape (>= 0.8.6),
+    stats,
+    methods,
+    Biobase, 
+    rlang,
+    statmod (>= 1.4.29),
+    splineTimeR,
+    splines
+License: GPL-2
+LazyData: true
+RoxygenNote: 6.1.1
+Suggests: knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: knitr
+Encoding: UTF-8
