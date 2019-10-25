@@ -1,0 +1,12 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^bioinformatics-rnaseq-repeated$
+^data-raw$
+^simulation$
+^\.travis\.yml
+^bioinformatics-rnaseq-repeated-revised$
+^\.ReadMe\.Rmd
+^\.ReadMe\.html
+^cran-comments\.md$
+^\.gitignore$
+^\.Rhistory$
