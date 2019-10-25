@@ -33,3 +33,4 @@ Suggests: knitr,
     testthat
 VignetteBuilder: knitr
 Encoding: UTF-8
+biocViews:
