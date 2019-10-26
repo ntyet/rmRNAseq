@@ -1,10 +1,10 @@
 Package: rmRNAseq
 Type: Package
-Title: RNA-seq Analysis for Repeated-measures Data
+Title: RNA-Seq Analysis for Repeated-Measures Data
 Version: 0.1.0
 Author: Yet Nguyen <tienyettoan@gmail.com>
 Maintainer: Yet Nguyen <tienyettoan@gmail.com>
-Description: This package implements a differential expression analysis for RNA-seq data from repeated-measures design using general linear model framework and parametric bootstrap inference. 
+Description: A differential expression analysis method for RNA-seq data from repeated-measures design using general linear model framework and parametric bootstrap inference. 
 Depends: R (>= 3.3)
 biocViews:
 Imports:
@@ -23,13 +23,13 @@ Imports:
     Biobase, 
     rlang,
     splineTimeR,
-    splines
+    splines,
+    statmod (>= 1.4.29)
 License: GPL-2
 LazyData: true
 RoxygenNote: 6.1.1
 Suggests: knitr,
     rmarkdown,
     testthat
-VignetteBuilder: knitr
 Encoding: UTF-8
 

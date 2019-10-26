@@ -1,24 +1,28 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # rmRNAseq
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
-The goal of rmRNAseq is to conduct differential expression analysis
-using RNA-seq data from repeated-measures designs, where mRNA samples
-are obtained repeatedly at different times from same experimental units.
-Our method is developed based on a general linear model framework with
-continuous autoregressive correlation structure of order one,
-accompanied by a parametric bootstrap inference strategy to conduct
-general hypothesis testings.
+The goal of rmRNAseq is to conduct differential expression analysis using RNA-seq data from repeated-measures designs, where mRNA samples are obtained repeatedly at different times from same experimental units. Our method is developed based on a general linear model framework with continuous autoregressive correlation structure of order one, accompanied by a parametric bootstrap inference strategy to conduct general hypothesis testings.  
 
 ## Installation
 
-You can install the released version of rmRNAseq from
-[CRAN](https://CRAN.R-project.org) with:
+You can install the released version of rmRNAseq from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
 install.packages("rmRNAseq")
@@ -30,12 +34,11 @@ And the development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("ntyet/rmRNAseq")
 ```
-
 ## Example
 
 This is a basic example which shows you how to solve a common problem:
 
-``` r
+```{r example}
 library(rmRNAseq)
 data(dat)
 data(design)
@@ -55,22 +58,10 @@ C.matrix[[2]] <- limma::makeContrasts(time2, time6, time24, levels = design)
 names(C.matrix) <- c("line2", "time")
 TCout <- rmRNAseq:::TC_CAR1(counts, design, Subject, Time, C.matrix,
 Nboot, ncores, print.progress, saveboot)
-#> running bootstrap sample nrep =  1 
-#> ---------------------------------------------
-#> running bootstrap sample nrep =  2 
-#> ---------------------------------------------
 names(TCout)
-#> [1] "NewTime"    "TimeMinOut" "ori.res"    "pqvalue"
 TCout$NewTime[1:4]
-#> [1] 0.1492027 0.8028973 1.0000000 0.0000000
 TCout$pqvalue$pv
-#>       line2      time
-#> 1 0.2857143 0.1428571
-#> 2 0.1428571 0.1428571
-#> 3 1.0000000 0.1428571
 TCout$pqvalue$qv
-#>       line2      time
-#> 1 0.4285714 0.1428571
-#> 2 0.4285714 0.1428571
-#> 3 1.0000000 0.1428571
+
 ```
+

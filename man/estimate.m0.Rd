@@ -38,8 +38,6 @@ m0
   Wise. Estimating the Number of True Null Hypotheses from a Histogram of p
   Values. Journal of Agricultural, Biological, and Environmental Statistics
   Vol. 11, No. 3 (Sep., 2006), pp. 337-356.
-
-2. \url{http://www.public.iastate.edu/~dnett/microarray/multtest.txt}.
 }
 \author{
 Dan Nettleton \email{dnett@iastate.edu}

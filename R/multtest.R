@@ -19,7 +19,6 @@
 #'   Wise. Estimating the Number of True Null Hypotheses from a Histogram of p
 #'   Values. Journal of Agricultural, Biological, and Environmental Statistics
 #'   Vol. 11, No. 3 (Sep., 2006), pp. 337-356.
-#' @references 2. \url{http://www.public.iastate.edu/~dnett/microarray/multtest.txt}.
 #' @examples
 #' data(res)
 #' p <- res$pqvalue$pv$line2
@@ -51,7 +50,6 @@ estimate.m0 = function(p, B = 20) {
 #'   Values. Journal of Agricultural, Biological, and Environmental Statistics
 #'   Vol. 11, No. 3 (Sep., 2006), pp. 337-356.
 #' @author Dan Nettleton \email{dnett@iastate.edu}
-#' @references 2. \url{http://www.public.iastate.edu/~dnett/microarray/multtest.txt}.
 #' @examples
 #' data(res)
 #' p <- res$pqvalue$pv$line2
