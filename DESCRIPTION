@@ -2,8 +2,8 @@ Package: rmRNAseq
 Type: Package
 Title: RNA-Seq Analysis for Repeated-Measures Data
 Version: 0.1.0
-Author: Yet Nguyen <tienyettoan@gmail.com>
-Maintainer: Yet Nguyen <tienyettoan@gmail.com>
+Authors@R: person("Yet", "Nguyen", email = "tienyettoan@gmail.com",
+  role = c("aut", "cre"))
 Description: A differential expression analysis method for RNA-seq data from repeated-measures design using general linear model framework and parametric bootstrap inference. 
 Depends: R (>= 3.3)
 biocViews:
