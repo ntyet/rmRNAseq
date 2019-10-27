@@ -15,6 +15,7 @@
 #' \item{qv}{a vector of q-values corresponding to the \code{pv} above.}
 #' @importFrom rlang .data
 #' @examples
+#' \donttest{
 #' data(dat)
 #' data(design)
 #' counts <- dat[1:100,]
@@ -22,6 +23,7 @@
 #' Effect <- "line2"
 #' edgeRout <- rmRNAseq:::edgeRFit(counts, design, Effect)
 #' names(edgeRout)
+#' }
 edgeRFit <- function(counts, design, Effect) {
   y <- edgeR::DGEList(counts = counts, lib.size = apply(counts, 2, stats::quantile, 0.75))
   y <- edgeR::estimateDisp(y, design, robust = T)

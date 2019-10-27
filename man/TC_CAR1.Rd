@@ -42,7 +42,7 @@ This function implements our  parametric bootstrap to analyze
 repeated measures RNA-seq data.
 }
 \examples{
-\dontrun{
+\donttest{
 # This example shows how to implement the method using LPS RFI data.
 data(dat)
 data(design)

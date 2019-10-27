@@ -33,7 +33,7 @@ repeated measures data, where data is log-transformed output from
 \code{\link[limma]{voom}}.
 }
 \examples{
-\dontrun{
+\donttest{
 data(res)
 data(design)
 data(covset)

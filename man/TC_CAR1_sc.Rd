@@ -52,7 +52,7 @@ using  methods: \code{\link{TC_CAR1}},
 , \code{\link{DESeq2Fit}}.
 }
 \examples{
-\dontrun{
+\donttest{
 data(resSymm)
 data(design)
 data(covset)

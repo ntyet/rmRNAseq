@@ -151,7 +151,7 @@ voomgls_Symm <- function(v, Subject, Time, ncores=1, C.matrix = NULL, beta0=NULL
 #'  columns.
 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'data(resSymm)
 #'v <- resSymm$ori.res$v[1:20,]
 #'newlm <- resSymm$ori.res$newlm[1:20,]
@@ -318,7 +318,7 @@ myvoom <- function (counts, design = NULL, lib.size = NULL, normalize.method = "
 #' \item{varbeta}{the estimates of variance of fixed effects, just include
 #'  lower part and diagonal part of the variance-covariance matrix.}
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'data(res)
 #'data(design)
 #'data(covset)
@@ -383,7 +383,7 @@ glsCAR1 <- function(d) {
 #'   \code{\link{glsCAR1}} function, shrinkage estimates of error variances, and
 #'   F-type test statistics calculated by  \code{\link{teststat}} function.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(res)
 #' data(covset)
 #' v <- res$ori.res$v
@@ -453,7 +453,7 @@ voomgls_CAR1 <- function(v, Subject, Time, ncores=1, C.matrix, beta0=NULL, print
 #' @return a vector of 2 components correspinding to the two time points
 #' that are mapping to 0, 1, respectively.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(res)
 #' data(covset)
 #' v <- res$ori.res$v
@@ -487,7 +487,7 @@ TimeMin <- function(v, Subject, Time, ncores){
 #' @return reml log-likelihood value
 #' @importFrom nlme gls varFixed corCAR1 glsControl
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'data(res)
 #'data(design)
 #'data(covset)
@@ -551,7 +551,7 @@ glsCAR1_loglik <- function(d){
 #' @importFrom stats constrOptim logLik median
 #' @return New time points.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(res)
 #' data(covset)
 #' v <- res$ori.res$v
@@ -613,7 +613,7 @@ NewTimeEst <- function(v, Subject, Time, TimeMinOut, ncores){
 #' @references Yet Nguyen, Dan Nettleton, 2019. rmRNAseq: RNA-seq Analysis for Repeated-measures Data.
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'data(res)
 #'v <- res$ori.res$v[1:50,]
 #'newlm <- res$ori.res$newlm[1:50,]
@@ -684,7 +684,7 @@ sc_CAR1 <- function(BetaMat, Sigma2Vec, RhoVec, WeightMat, lib.size, design, Sub
 #'   approach, using \code{\link{jabes.q}} function.}
 #' @references Yet Nguyen, Dan Nettleton, 2019. rmRNAseq: RNA-seq Analysis for Repeated-measures Data.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # This example shows how to implement the method using LPS RFI data.
 #' data(dat)
 #' data(design)

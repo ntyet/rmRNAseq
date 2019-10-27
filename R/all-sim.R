@@ -27,7 +27,7 @@
 #' @importFrom reshape melt
 #' @importFrom stats coef model.matrix quantile vcov
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(resSymm)
 #' data(design)
 #' data(covset)

@@ -28,10 +28,12 @@ lower triangular elements.
 elements are 1, therefore there is no need in storing the diagonal elements.
 }
 \examples{
+\donttest{
 set.seed(1)
 lower.tri.vector <- runif(10)
 varout <- rmRNAseq:::varbeta(lower.tri.vector, diag=TRUE)
 varout
+}
 }
 \references{
 Yet Nguyen, Dan Nettleton, 2019. rmRNAseq: RNA-seq Analysis for Repeated-measures Data

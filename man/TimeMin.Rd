@@ -28,7 +28,7 @@ The correlation parameters are estimateed by fitting
 \code{\link{voomgls_Symm}} to the \code{\link[limma]{voom}} transformed data.
 }
 \examples{
-\dontrun{
+\donttest{
 data(res)
 data(covset)
 v <- res$ori.res$v

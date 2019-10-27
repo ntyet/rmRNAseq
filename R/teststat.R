@@ -14,6 +14,7 @@
 #' @return A matrix of dimension G X length(C.matrix) of F-similar test
 #'   statistics
 #' @examples
+#' \donttest{
 #' data(design)
 #' beta0 <- NULL
 #' regression.output <- res$ori.res$newlm[1:50,]
@@ -24,6 +25,7 @@
 #' names(C.matrix) <- c("line2","time")
 #' teststatout <- rmRNAseq:::teststat(C.matrix, beta0, regression.output, ncores)
 #' head(teststatout)
+#' }
 
 teststat <- function(C.matrix, beta0=NULL, regression.output, ncores = 1) {
   beta.coef <- data.matrix(regression.output[grep(pattern = "fixed.", x = names(regression.output))])

@@ -29,7 +29,7 @@ this function is very specific for this dataset, with only
 method needs to be updated.
 }
 \examples{
-\dontrun{
+\donttest{
 data(res)
 data(covset)
 v <- res$ori.res$v

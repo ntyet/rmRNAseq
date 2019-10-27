@@ -27,6 +27,7 @@ This function analyzes the RFI RNA-seq data and simulated datasets using
 package.
 }
 \examples{
+\donttest{
 data(dat)
 data(design)
 counts <- dat[1:100,]
@@ -34,4 +35,5 @@ design <- design
 Effect <- "line2"
 edgeRout <- rmRNAseq:::edgeRFit(counts, design, Effect)
 names(edgeRout)
+}
 }

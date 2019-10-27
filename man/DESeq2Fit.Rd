@@ -28,7 +28,7 @@ This function analyzes the LPS RFI RNA-seq data and simulated datasets using
 package.
 }
 \examples{
-\dontrun{
+\donttest{
 data(dat)
 data(design)
 counts <- dat[1:100,]

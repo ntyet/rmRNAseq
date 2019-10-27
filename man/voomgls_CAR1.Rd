@@ -36,7 +36,7 @@ correlation structure in function \code{\link[nlme]{gls}} for all genes where
 the input data come from the output of \code{\link[limma]{voom}}.
 }
 \examples{
-\dontrun{
+\donttest{
 data(res)
 data(covset)
 v <- res$ori.res$v

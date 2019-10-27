@@ -35,7 +35,7 @@ a matrix of count data that has nrow(BetaMat) rows and nrow(design)
 This function generates bootstrap samples using parametric bootstrap method.
 }
 \examples{
-\dontrun{
+\donttest{
 data(res)
 v <- res$ori.res$v[1:50,]
 newlm <- res$ori.res$newlm[1:50,]

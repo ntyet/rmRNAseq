@@ -17,10 +17,12 @@
 #' @references Yet Nguyen, Dan Nettleton, 2019. rmRNAseq: RNA-seq Analysis for Repeated-measures Data
 #'
 #' @examples
+#' \donttest{
 #' set.seed(1)
 #' lower.tri.vector <- runif(10)
 #' varout <- rmRNAseq:::varbeta(lower.tri.vector, diag=TRUE)
 #' varout
+#' }
 varbeta <- function(lower.tri.vector, diag = TRUE) {
   n <- length(lower.tri.vector)
   if (diag) {

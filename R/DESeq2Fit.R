@@ -17,7 +17,7 @@
 #' @import DESeq2
 #' @importFrom stats as.formula
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(dat)
 #' data(design)
 #' counts <- dat[1:100,]

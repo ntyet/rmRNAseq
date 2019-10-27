@@ -24,7 +24,7 @@ This function calculates log-likelihood value of glsCAR1 for
 each gene using \code{\link[limma]{voom}} data.
 }
 \examples{
-\dontrun{
+\donttest{
 data(res)
 data(design)
 data(covset)

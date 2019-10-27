@@ -28,6 +28,7 @@ This function is to calculate F-type test statistics for a general linear
 hypothesis for each of G genes.
 }
 \examples{
+\donttest{
 data(design)
 beta0 <- NULL
 regression.output <- res$ori.res$newlm[1:50,]
@@ -38,4 +39,5 @@ C.matrix[[2]] <- limma::makeContrasts(time2, time6, time24, levels = design)
 names(C.matrix) <- c("line2","time")
 teststatout <- rmRNAseq:::teststat(C.matrix, beta0, regression.output, ncores)
 head(teststatout)
+}
 }
