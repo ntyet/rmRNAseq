@@ -4,7 +4,10 @@ Title: RNA-Seq Analysis for Repeated-Measures Data
 Version: 0.1.0
 Authors@R: person("Yet", "Nguyen", email = "tienyettoan@gmail.com",
   role = c("aut", "cre"))
-Description: A differential expression analysis method for RNA-seq data from repeated-measures design using general linear model framework and parametric bootstrap inference. 
+Description: A differential expression analysis method for RNA-seq data from repeated-measures design 
+    using general linear model framework and parametric bootstrap inference. The method accounts for 
+    the dependence of gene expression levels due to the repeated-measures through continuous autoregressive 
+    correlation structure.  
 Depends: R (>= 3.3)
 biocViews:
 Imports:
