@@ -22,3 +22,6 @@ R/gls_funcs.R
 *%*
 
 /bioinformatics-rnaseq-repeated
+/simulation
+.travis.yml
+data-raw
