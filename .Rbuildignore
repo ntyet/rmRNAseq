@@ -3,7 +3,6 @@
 ^bioinformatics-rnaseq-repeated$
 ^data-raw$
 ^simulation$
-^\.travis\.yml
 ^bioinformatics-rnaseq-repeated-revised$
 ^\.ReadMe\.Rmd
 ^\.ReadMe\.html
@@ -13,3 +12,4 @@
 ^README\.Rmd$
 ^NEWS\.md$
 ^rmRNAseq\.Proj$
+^\.travis\.yml$
