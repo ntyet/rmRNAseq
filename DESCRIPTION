@@ -9,22 +9,22 @@ Depends: R (>= 3.3)
 biocViews:
 Imports:
     AUC (>= 0.3.0),
-    edgeR (>= 3.16.5),
+    Biobase,
     DESeq2,
+    edgeR (>= 3.16.5),
     graphics,
     limma (>= 3.30.13),
     MASS (>= 7.3-45),
     Matrix (>= 1.2-8), 
+    methods,
     nlme (>= 3.1-131),
     parallel,
     reshape (>= 0.8.6),
-    stats,
-    methods,
-    Biobase, 
     rlang,
-    splineTimeR,
     splines,
-    statmod (>= 1.4.29)
+    splineTimeR,
+    statmod (>= 1.4.29),
+    stats
 License: GPL-2
 LazyData: true
 RoxygenNote: 6.1.1
