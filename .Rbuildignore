@@ -11,3 +11,4 @@
 ^\.gitignore$
 ^\.Rhistory$
 ^README\.Rmd$
+^NEWS\.md$
