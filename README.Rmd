@@ -46,7 +46,7 @@ library(rmRNAseq)
 data(dat)
 data(design)
 data(covset)
-Subject <- covset$ear # identify of experimental units
+Subject <- covset$ear # identity of experimental units
 Time <- covset$time # times at which mRNA samples are taken
 Nboot <- 2  # for real data analysis, use Nboot at least 100
 ncores <- 1 # for real data analysis and if the computer allows, increase ncores to save time
