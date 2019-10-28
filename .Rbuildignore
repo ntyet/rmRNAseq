@@ -13,3 +13,4 @@
 ^NEWS\.md$
 ^rmRNAseq\.Proj$
 ^\.travis\.yml$
+^CRAN-RELEASE$
