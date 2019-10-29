@@ -1,0 +1,365 @@
+\documentclass{bioinfo}
+\usepackage{url}
+\graphicspath{{figure/}}
+\usepackage{bbm}
+\copyrightyear{2015} \pubyear{2015}
+
+\access{Advance Access Publication Date: Day Month Year}
+\appnotes{Manuscript Category}
+\begin{document}
+\DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png}
+\firstpage{1}
+
+\subtitle{Gene Expression}
+
+\title[RNA-seq Analysis for Repeated-measures Data]{RNA-seq Analysis for Repeated-measures Data}
+\author[Yet Nuyen \textit{et~al}.]{Yet Nguyen\,$^{\text{\sfb 1,}*}$, Dan Nettleton\,$^{\text{\sfb 2}}$}
+\address{$^{\text{\sf 1}}$Department of Mathematics and Statistics, Old Dominion University, Norfolk, VA 23529, USA.\\
+$^{\text{\sf 2}}$Department of Statistics, Iowa State University, Ames, IA 50011,
+USA.}
+
+\corresp{$^\ast$To whom correspondence should be addressed.}
+
+\history{Received on XXXXX; revised on XXXXX; accepted on XXXXX}
+
+\editor{Associate Editor: XXXXXXX}
+
+\abstract{\textbf{Motivation:} With the reduction in price of next generation sequencing technologies, gene expression profiling using RNA-seq has increased the scope of sequencing experiments to include more complex designs, such as repeated-measures.  In such designs, RNA samples are extracted from each experimental unit at multiple time points.  The read counts that result from RNA sequencing of the samples extracted from the same experimental unit tend to be temporally correlated.  Although there are many methods for RNA-seq differential expression analysis, existing methods do not properly account for within-unit correlations that arise in repeated-measures designs.\\
+\textbf{Results:} We address this shortcoming by using normalized log-counts and associated precision weights in a general linear model pipeline with continuous autoregressive structure to account for the correlation among observations within each experimental unit. We then utilize parametric bootstrap to conduct differential expression inference. Simulation studies show the advantages of our method over alternatives that do not account for the correlation among observations within experimental units. \\
+\textbf{Availability:} We provide an R package implementing our proposed method at \url{https://github.com/ntyet/tcrmrnaseq} \\
+\textbf{Contact:} \href{ynguyen@odu.edu}{ynguyen@odu.edu}\\
+\textbf{Supplementary information:} Supplementary data are available at \textit{Bioinformatics}
+online.}
+
+\maketitle
+
+\section{Introduction \label{RMintro}}
+
+One of the goals of transcriptomics data  analysis is to identify genes whose mean transcript abundance levels differ across the levels of one or more categorical factors of interest. Such genes are typically referred to as differentially expressed (DE). Genes that are not DE are referred to as equivalently expressed (EE). Over the past decade, RNA sequencing (RNA-seq)  technologies  have emerged as a powerful and increasingly popular tool for expression profiling and differential expression analysis \citep{oshlack2010}. In a typical RNA-seq experiment, messenger RNA (mRNA) is extracted from each biological sample of interest. Molecules of mRNA sample are converted to complementary DNA (cDNA) fragments  which are sequenced with high-throughput sequencing technology. This process generates millions of short reads from one or both ends of cDNA fragments. These  short reads are mapped to the reference genome and the number of mapped short reads for a gene  represents a measurement of the transcript abundance level of that gene in a given sample. 
+
+With the decreasing  price  and increasing use of next generation sequencing technologies, RNA-seq experimental designs have become more complex. As a motivating example, we consider an RNA-seq experiment conducted on eight pigs, four from a high residual feed intake line (HRFI) and  four from a low residual feed intake line (LRFI). Researchers wanted to evaluate how pigs from different lines respond to a treatment designed to stimulate the immune system, and how the responses change over time at the molecular genetic level. They used RNA-seq technology to measure transcript abundances in blood samples from each pig at four times after treatment: 0, 2, 6, and 24 hours. The experiment is explained in greater detail in Section~\ref{RMdataanalysis} of this paper. A  statistical model for these data should consider the within-unit correlation  expected due to repeated measurements on each pig. 
+
+Many general purpose  RNA-seq differential expression analysis methods have been developed,  such as edgeR \citep{Robinson2010a}, QuasiSeq \citep{lund2012},  DESeq and DESeq2 \citep{anders2010, love2014} among many others. These methods use negative binomial generalized linear models to analyze  RNA-seq data and are appropriate for designs providing uncorrelated measurements within each gene. Furthermore, several  methods have been developed for time-course designs, such as NextmaSigPro \citep{nueda2014}, DyNB \citep{aijo2014}, TRAP \citep{jo2014}, SMARTS \citep{wise2015}, and EBSeq-HMM \citep{leng2015}, which were collectively reviewed  by  \citet{spies2015}.  However, these methods do not take within-unit correlation of transcript abundance measurements into account, which may result in many false discoveries or failure to distinguish EE and DE genes. Theoretically, a generalized linear mixed model (GLMM) approach can be used to account for random effects and general correlation structure, but the approach  suffers from convergence issues for many genes because RNA-seq experiments usually have  a small sample size and many zero counts for many genes \citep{cui2016}. Therefore, a new statistical method that is stable numerically under small sample size circumstances and,  at the same time,  controls type I error rate well is desirable. One approach that addresses numerical instability  when analyzing repeated-measures RNA-seq data is to use normal-error linear modeling for log-transformed counts instead of using  discrete probability distributions, such as the negative binomial distribution. 
+
+\citet{law2014}  proposed the voom approach  for analyzing log-transformed RNA-seq data with linear models that explicitly account for heteroscedasticity by the use of precision weights. They showed that correctly capturing the mean-variance relationship in the transformed data is more important than assuming a probability model that acknowledges  the discrete characteristics of the original counts. In particular, by estimating precision weights for  observations of transformed counts and including them into a general linear model framework, \citet{law2014} showed that the log-transformed-based linear model approach performs better than methods based on negative binomial models. Furthermore,  the voom approach facilitates more complex analyses, such as the variance component score test for gene set testing in longitudinal RNA-seq data recently proposed by \cite{angiel2017}. 
+
+In our paper, we will take advantage of the voom approach together with a parametric bootstrap method to detect DE genes with repeated-measures RNA-seq data. For each gene, we model the correlation among observations taken at unequally-spaced time points by a continuous autoregressive correlation structure in a general linear model framework. Parameters are estimated by residual maximum likelihood (REML) using the \texttt{gls} function in the \texttt{nlme} R package \citep{Pinheiro2017R}. We conduct hypothesis testing using a parametric bootstrap method. Simulation studies show the advantages of our method over alternatives that do not account for the correlation among observations within each gene in terms of false discovery rate (FDR) control and the ability to distinguish EE and DE genes. Although, we focus on repeated-measures analysis in this paper, our method can also be  extended to other complex designs accounting for dependence. 
+
+The remainder of the paper is organized as follows. We formally define our proposed method in Section~\ref{RMmethod}, first by revisiting the voom procedure and then specifying the bootstrap strategy for inference. In Section~\ref{RMdataanalysis}, we apply the proposed method as well as  other alternative methods to analyze the repeated-measures RNA-seq dataset that motivates our work. 
+We compare the performance of our method with that of alternative methods by a simulation study in  Section~\ref{RMss}. The paper concludes with a discussion in Section~\ref{RMdiscussion}.
+
+%\enlargethispage{12pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Methods}\label{RMmethod}
+\subsection{Notations and Preliminaries}
+Consider the analysis of $m$ genes using RNA-seq read count data from $n$ subjects and $T$ time points. For $g = 1, \dots, m$, $i = 1, \dots, n$, and $t = 1, \dots, T$, let $r_{git}$ be the read count for gene $g$ from subject $i$ at time  $d_t$. Let $\boldsymbol{x}_{it} = (\boldsymbol{x}'_{it1}, \dots, \boldsymbol{x}'_{itk})'$ be a
+vector encoding information on $k$ explanatory variables for subject   $i$  at time  $d_t$. The $k$ explanatory variables may include multilevel factors of primary scientific interest and  other continuous or multilevel categorical covariates. Let $\boldsymbol{X} = (\boldsymbol{x}_{11}, \dots, \boldsymbol{x}_{1T}, \dots, \boldsymbol{x}_{n1}, \dots, \boldsymbol{x}_{nT})'$ and (without loss of generality) suppose that $\boldsymbol{X}$ has full column rank with $\mbox{rank}(\boldsymbol{X}) = u$. \citet{law2014} defined the following transformation to obtain the log-counts per million (log-cpm) for each count
+\begin{equation}\label{RMlogcpm}
+y_{git} = \log_2\left( \frac{r_{git} +0.5}{R_{it} +1} \times 10^6\right), \; \boldsymbol{y}_g = (y_{g11}, \dots, y_{g1T}, \dots, y_{gn1}, \dots, y_{gnT})',
+\end{equation}
+where $R_{it} = \sum_{g = 1}^m r_{git}$ is the sum of read counts computed for subject $i$ at time $d_t$. In general, $\{R_{it}\}$ can be any normalization factors that account for differences in read counts across the RNA-seq samples. Many normalization procedures have been proposed in the literature (see, e.g., \citet{marioni2008}, \citet{mortazavi2008}, \citet{robinson2010}, \citet{anders2010}, \citet{bullard2010}, \citet{risso2014normalization}, \citet{risso2014role}, and references therein). Throughout this paper, we set $R_{it}$ to be the 0.75 quantile of RNA-seq sample read counts from subject $i$ at time $d_t$ according to the recommendation of \citet{bullard2010}. With this choice for the normalization factor, the $y_{git}$ values are no longer ``counts per million mapped reads" on the log scale, but this interpretation is irrelevant for the differential expression analysis that is the focus of our work.
+
+\subsection{The voom Procedure}\label{voomSec}
+The voom procedure \citep{law2014} estimates the mean-variance relationship of the log-counts and generates a precision weight for each observation according to the following algorithm:
+\begin{enumerate}
+  \item[1.] For each gene $g$, initially assume the linear model
+  \[
+  y_{git} = \boldsymbol{x}_{it}^T\boldsymbol{\beta}_g + \varepsilon_{git}, 
+  \]
+  where  $ \mbox{E}(\varepsilon_{git}) = 0$ and  $\mbox{Var}(\varepsilon_{git}) = \sigma^2_g$ for all $ g = 1, \dots, m;\; i = 1, \dots, n;\; t = 1, \dots, T$.
+  \item[2.] Let $\widetilde{\boldsymbol{\beta}}_g = (\boldsymbol{X}'\boldsymbol{X})^{-1}\boldsymbol{X}'\boldsymbol{y}_g$ and $\tilde{\sigma}_g = \sqrt{\frac{\left(\boldsymbol{y}_g - \boldsymbol{X}\widetilde{\boldsymbol{\beta}}_g\right)'\left(\boldsymbol{y}_g - \boldsymbol{X}\widetilde{\boldsymbol{\beta}}_g\right)}{nT - u}}$.
+  \item[3.] Let $\tilde{r}_g = \frac{1}{nT}\sum_{i = 1}^n\sum_{t = 1}^T y_{git} +\frac{1}{nT}\log_2 \left(\prod_{i = 1}^n\prod_{t = 1}^T (R_{it}+1)\right) - \log_2(10^6)$ be the mean log-count value for gene $g$.
+\item[4.] Let $\mbox{lo}(\cdot)$ be the predictor obtained by fitting a LOWESS regression \citep{cleveland1979} of $\tilde{\sigma}_g^{1/2}$ on $\tilde{r}_g$. The voom precision weight for $y_{git}$ is calculated by
+\[
+w_{git} = \left[\mbox{lo}\left( \boldsymbol{x}_{it}^T\widetilde{\boldsymbol{\beta}}_g + \log_2(R_{it}+1) - \log_2(10^6)  \right)\right]^{-4}.
+\]
+\end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modeling for Repeated Measure RNA-seq Data}\label{RMvoomSec}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+To account for the correlation among observations for each gene $g$, we assume the Gaussian general linear model
+\begin{equation}\label{RMeq1}
+ \boldsymbol{y}_g = \boldsymbol{X}\boldsymbol{\beta}_g +\boldsymbol{\varepsilon}_g, \quad  \boldsymbol{\varepsilon}_g \sim {\mathcal N}(\boldsymbol{0}, \sigma^2_g\boldsymbol{V}_g), \quad \boldsymbol{V}_g =    \boldsymbol{W}_g^{-1/2} \boldsymbol{A}_g \boldsymbol{W}_g^{-1/2} ,
+\end{equation}
+where
+\[
+\boldsymbol{W}_g =
+\begin{bmatrix}
+w_{g11} &  0  & \ldots & 0\\
+0  &  w_{g12} & \ldots & 0\\
+\vdots & \vdots & \ddots & \vdots\\
+0  &   0       &\ldots & w_{gnT}
+\end{bmatrix}
+\]
+is the matrix of precision weights
+and
+$\boldsymbol{A}_g$ is an $nT\times nT$  block-diagonal correlation matrix consisting of $n$ blocks $\boldsymbol{D}_g$ of  size $T\times T$ whose form is defined by the correlation structure used to model the dependence among observations from the same subject. A complete treatment for choosing the most appropriate correlation structure of $\boldsymbol{D}_g$ is important but out of scope of this paper. In this paper, as a common assumption in repeated-measures analysis,  we consider the \texttt{corCAR1} \citep{pinheiro2000} form 
+\[
+\boldsymbol{D}_g =
+\begin{bmatrix}
+1 &  \rho_g^{|d_2 -d_1|}  & \ldots & \rho_g^{|d_T -d_1|}\\
+ \rho_g^{|d_1 -d_2|}   &  1 & \ldots & \rho_g^{|d_T -d_2|}\\
+\vdots & \vdots & \ddots & \vdots\\
+\rho_g^{|d_1 -d_T|}  &   \rho_g^{|d_2 -d_T|}       &\ldots & 1
+\end{bmatrix},
+\quad 0 \leq \rho_g < 1.
+\]
+\subsubsection{More on Correlation Structure: \texttt{corCAR1}}\label{CAR1}
+As a common assumption in repeated-measures data analysis, observations taken farther in time tend to be more correlated than observations taken closer in time. Even though \texttt{corCAR1} correlation structure honors this common characteristic in most repeated measures experiment,  however, there are other exceptional cases, for example, when the observations that are collected at the same time of day are probably more correlated than the observations that are collected at different times of day. This situation happens in our motivating example, where the blood samples were taken at 0 hour, 2 hours, 6 hours, and 24 hours after LPS injection. Obviously, the observations that taken at times 0 and 24 are expected to be more correlated than the observations that taken, for example, at times 0 and 6. In such situations, it is better to use a new set of time points instead of the original time points such that the relative correlation  among observations taken at different time points is preserved.
+
+We propose the following algorithm to determine the new time points $d_1, \dots, d_T$
+
+\begin{itemize}
+\item For each gene $g$, fit model \eqref{RMeq1} using $\boldsymbol{D}_g$ as an $T \times T$ general correlation matrix  (\texttt{corSymm} structure  instead of the \texttt{\texttt{corCAR1}} structure is used when fitting \texttt{gls}) , and obtain REML estimates of the $T(T-1)/2$ correlation  parameters. 
+\item Identify the pair of time points among original time points at which the observations has smallest median correlations (across all genes). This pair of time points is mapping to 0 and 1 without loss of generality. Suppose $d_1 = 0, d_T = 1$. The other parameters $d_2, \dots, d_{T-1}$ are estimated as follows
+\begin{itemize}
+\item Given $ \boldsymbol{d} =  \{d_2, \dots, d_{T-1}\}$, fit  model \eqref{RMeq1}  using $\boldsymbol{D}_g$ as an $T \times T$ block-diagonal correlation matrix where each block has the \texttt{corCAR1} structure with correlation parameter $\rho_g$ and $T$ time points $d_1, \dots, d_T$. Obtain the REML log-likelihood $ l_g(\widehat{\sigma}^2_g, \widehat{\rho}_g| \boldsymbol{d})$.
+
+\item  $\boldsymbol{d}$ is estimated as the maximizer of $h(\boldsymbol{d})$, where 
+ $$
+ h(\boldsymbol{d}) = \sum_{g= 1}^m l_g(\widehat{\sigma}^2_g, \widehat{\rho}_g| \boldsymbol{d}).
+ $$
+\end{itemize}
+\end{itemize}
+
+Using these new time points $\boldsymbol{d}$, we then employ the function \texttt{gls} in the \texttt{nlme} R package \citep{Pinheiro2017R} to fit model \eqref{RMeq1},  resulting in the REML estimators $\widehat{\sigma}^2_g$ and $\widehat{\rho}_g$ of $\sigma_g^2$ and $ \rho_g$, respectively, as well as  the plug-in estimator $\widehat{\boldsymbol{V}}_g = \boldsymbol{W}_g^{-1/2} \widehat{\boldsymbol{D}}_g\boldsymbol{W}_g^{-1/2}$ of  $\boldsymbol{V}_g$ where $\rho_g$  in $\boldsymbol{D}_g$ is substituted by $\widehat{\rho}_g$, and
+$\widehat{\boldsymbol{\beta}}_g = (\boldsymbol{X}'\widehat{\boldsymbol{V}}_g^{-1}\boldsymbol{X})^{-1} \boldsymbol{X}'\widehat{\boldsymbol{V}}_g^{-1}\boldsymbol{y}_g$ as an estimator of $\boldsymbol{\beta}_g$.
+
+\subsubsection{More on Correlation Structure: \texttt{corSymm}} 
+Another option for modeling the correlation structure in repeated measures data analysis is the general correlation  structure \texttt{corSymm} (i.e., unstructured correlation) which is fitted in \texttt{gls} by method \texttt{corSymm}. An advantage of using \texttt{corSymm} correlation structure is that it avoids lack of fit in terms of correlation. However, a big disadvantage is that the  correlation structure \texttt{corSymm} needs more parameters than \texttt{corCAR1}, therefore, it is highly unstable, especially in the small sample experiments such as RNA-seq experiments. Nevertheless, we still include this correlation structure in the data analysis and in simulation so that we can see its impacts on RNA-seq differential expression analysis.  
+Either using \texttt{corCAR1} or \texttt{corSymm}, next steps of our methodology are essentially the same.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shrinkage Estimators of Error Variances}\label{RMshrinkageSec}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In microarray analysis, \citet{smyth2004}  showed that  using  the shrinkage of the estimated error variances toward  a pooled estimate can stabilize  inference when the number of arrays is small. We follow the same procedure to obtain the shrinkage estimator of the error variance $\sigma^2_g$ for each gene. Particularly, we assume that
+\begin{equation}\label{RMeq2}
+\widehat{\sigma}^2_g | \sigma^2_g \sim \sigma^2_g \frac{\chi^2_{nT-u}}{nT - u}
+\end{equation}
+and, for some parameters $s^2_0$ and $u_0$,
+\[
+\frac{u_0s_0^2}{\sigma_g^2} \sim \chi^2_{u_0},
+\]
+which together with \eqref{RMeq2} implies an inverse-gamma conditional distribution for $\sigma^2_g$ specified by
+\[
+\frac{1}{\sigma^2_g} \Big| \widehat{\sigma}^2_g \sim \mbox{Gamma}\left( \frac{nT - u + u_0}{2}, \frac{(nT - u)\widehat{\sigma}^2_g + u_0 s^2_0}{2(nT - u + u_0)} \right).
+\]
+ A shrinkage  estimator of $\sigma^2_g$ is given by
+\begin{equation}\label{RMeq3}
+s^2_g = \widehat{E}^{-1}(\sigma^{-2}_g|\widehat{\sigma}^2_g)= \frac{(nT - u)\widehat{\sigma}^2_g + \widehat{u}_0 \widehat{s}^2_0}{nT - u + \widehat{u}_0},
+\end{equation}
+where  $\widehat{u}_0$ and  $\widehat{s}_0^2$ are the estimators of the hyper-parameters $u_0$ and $s^2_0$ obtained from the theoretical marginal distribution of $\widehat{\sigma}^2_g$ using a method of moments approach \citep{smyth2004}. The shrinkage estimator $s^2_g$ will be used in our inference strategy instead of the unshrunken REML estimator $\widehat{\sigma}_g^2$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{General Hypothesis Testing of  Regression Coefficients Using Moderated $F$-Statistics} \label{RMgeneraltest}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Suppose for each gene $g$ we are interested in testing  a null hypothesis of the form
+\[
+H_{0g}: \boldsymbol{C}\boldsymbol{\beta}_g = \boldsymbol{0} \quad \mbox{vs.}\mbox \quad H_{ag}: \boldsymbol{C}\boldsymbol{\beta}_g \neq \boldsymbol{0},
+\]
+where $\boldsymbol{C}$ is an $l\times u$ contrast matrix of rank $\l$. An extension of the  moderated $F$-statistic of   \cite{smyth2004} for gene $g$ is defined as
+\begin{equation}\label{RMeq4}
+K_g = (\boldsymbol{C} \widehat{\boldsymbol{\beta}}_g )'(\boldsymbol{C} (s_g^2\boldsymbol{X}'\widehat{\boldsymbol{V}}_g^{-1}\boldsymbol{X} )^{-1}\boldsymbol{C}')^{-1}(\boldsymbol{C}\widehat{\boldsymbol{\beta}}_g) /l.
+\end{equation}
+
+In general $\boldsymbol{C} \widehat{\boldsymbol{\beta}}_g$ is a non-linear function of $\boldsymbol{y}_g$,  and the exact distribution of $K_g$ is unknown even when model \eqref{RMeq1} holds exactly. Because RNA-seq experiments often have small sample size,  we cannot rely on asymptotic approximations  and instead will approximate the distribution of $K_g$ using a parametric bootstrap approach \citep{efron1993}. 
+For all $g = 1, \dots, m$, carry out the following steps:
+\begin{itemize}
+\item[1.] Simulate  $\boldsymbol{\varepsilon}_g^* \sim {\mathcal N}(\boldsymbol{0}, s^2_g\widehat{\boldsymbol{V}}_g)$ and calculate $\boldsymbol{y}^*_g = \boldsymbol{X}\widehat{\boldsymbol{\beta}}_g + \boldsymbol{\varepsilon}_g^* $.
+\item[2.] Calculate $r_{git}^*$ using $y_{git}^*$ according to \eqref{RMlogcpm}, i.e.,
+\[
+r_{git}^* = \max\{2^{y_{git}^*}\times(R_{it}+1)/10^6-0.5, 0\}.
+\]
+\item[3.] Apply the voom procedure described in Section~\ref{voomSec}, Section~\ref{RMvoomSec} and the shrinkage procedure described in Section~\ref{RMshrinkageSec} to  compute $\widehat{\boldsymbol{\beta}}_g^*, s_g^{2*}, \widehat{\rho}_g^*$, and $\widehat{\boldsymbol{V}}_g^*$ from $\{r_{git}^*\}$ and $\boldsymbol{X}$
+just as  $\widehat{\boldsymbol{\beta}}_g, s_g^{2}, \widehat{\rho}_g$, and $\widehat{\boldsymbol{V}}_g$ were obtained from  $\{r_{git}\}$ and $\boldsymbol{X}$.
+\item[4.] Compute
+$
+K_g^* = (\boldsymbol{C} \widehat{\boldsymbol{\beta}}_g^* -\boldsymbol{C} \widehat{\boldsymbol{\beta}}_g)'(\boldsymbol{C} (s_g^{2*}\boldsymbol{X}'\widehat{\boldsymbol{V}}_g^{*-1}\boldsymbol{X} )^{-1}\boldsymbol{C}')^{-1}(\boldsymbol{C}\widehat{\boldsymbol{\beta}}_g^* -\boldsymbol{C}\widehat{\boldsymbol{\beta}}_g) /l.
+$
+\item[5.] Repeat steps 1 through 4 $B$ times to obtain  null statistics $K_{g1}^*, \dots, K_{gB}^*$.
+ \end{itemize}
+Taking  advantage of the parallel structure in which the same model is fitted for each of many genes, 
+we  combine  the bootstrap null statistics for all genes to calculate a $p$-value for each gene. Numerically, the $p$-value for  gene $g$ is calculated by the proportion of all bootstrap null statistics  $\{K_{g1}^*, \dots, K_{gB}^*: g = 1, \dots, m\}$  that match or exceed the observed statistic $K_{g}$, i.e.,
+\begin{equation}\label{RMeq5}
+p_g = \frac{1}{mB} \sum_{j = 1}^m\sum_{b = 1}^B \mathbbm{1}(K^*_{jb} \geq K_{g}),
+\end{equation}
+where $\mathbbm{1}$ is an indicator function. These $p$-values are converted to $q$-values \citep{storey2002}. To approximately control FDR at any desired level $\alpha$, a null hypothesis is rejected if and only if its $q$-value is less than or equal to $\alpha$. When calculating $q$-values by the method of \cite{storey2002}, we need an estimate of $m_0$, the number of true null hypotheses among all $m$ null hypotheses tested. In this paper, $m_0$ is estimated by the histogram-based method of \cite{nettleton2006}.  Desirable theoretical properties of a closely related histogram-based approach were illustrated by \citet{liang2012}.
+
+The same idea of pooling used in \eqref{RMeq5} \citet{storey2005} in a time-course microarray analysis. Even if the test statistics for all genes do not follow the same null distribution, $p$-values computed via pooling can be valid for use in $q$-value estimation \citep{storey2004}. Particularly, \cite{storey2004} showed that a sufficient condition for valid $q$-value estimation is that the collection of $p$-values from tests with a true null hypothesis have an empirical distribution that is stochastically smaller than or equal to a uniform distribution.
+Results from the analysis of simulated data in Section~\ref{RMss} show that our approach to $p$-value calculation satisfies this sufficient condition and thus provides valid $p$-values for the calculation of $q$-values that can be used to control FDR.
+
+\subsection{Final Note on Our Methodology}
+When calculating $F$-statistics values, our proposed method using \texttt{corSymm} returns some extremely large $F$-statistics due to almost singular correlation matrix. This gives an undesired behavior of the set of $p$-values for any tested contrasts. To avoid this situation, for genes that result in extremely large $F$-statistics ($\geq 10^{3}$), the estimate $\boldsymbol{D}_g$ substituted by $(1 - 10^{-3})\boldsymbol{D}_g + 10^{-3} \boldsymbol{I}$.
+Furthermore, in what follows, we name our proposed method using \texttt{corCAR1} and \texttt{corSymmm} correlation structures as bootCAR1 and bootSymm, respectively.
+
+
+\section{Analysis of an LPS RNA-Seq Dataset}\label{RMdataanalysis}
+Lipopolysaccharide (LPS) is extensively used to study acute inflammatory and immune response in humans and animals.  In this section, we  apply our proposed method and three other methods -- DESeq2 \citep{love2014}, voom \citep{law2014}, and  edgeR \citep{Robinson2010a, lun2016} --
+to analyze an RNA-seq dataset  from  a study of the inflammatory response in pigs triggered by LPS at the transcription level \citep[Chapter~2]{liu2017}. The experiment design is described as follows. Four pigs of each residual feed intake line, HRFI and LRFI, were injected 
+LPS from \emph{E. coli} 05:B5 bacteria. Blood samples  were collected from eight pigs immediately before the injection (called time point 0 in the following), 2, 6, and 24 hours after the injection. An RNA sample was extracted and sequenced from each blood sample after globin depletion. In total,  there were 4 (pigs) $\times$ 2 (lines) $\times$ 4 (time points) = 32 RNA-seq libraries. Researchers wanted to understand the molecular mechanism of LPS response by identifying genes differentially expressed between lines (Line), across time points (Time),  or through interactions among lines and time points (Line $\times$ Time).
+
+This is an example of a repeated-measures design, where RNA samples were extracted from each pig at four different unequally-spaced time points. The RNA-seq dataset consists of read counts for 11911 genes for each of 32 RNA samples. Following standard practice, this dataset excludes genes with mostly low read counts because such genes contain little information about differential expression. In particular,  the 11911 genes analyzed in this study each have average read counts of at least 8 and no more than 28 zero counts across 32 RNA samples. The same threshold for gene inclusion was used throughout the simulation studies described in Section~\ref{RMss}.
+
+
+A special characteristic of this experiment is the potential for circadian rhythm effects that may induce the correlation between observations taken at the same time of day. Thus, although times 0 and 24 are farthest apart when time is considered to unfold on a linear axis, the correlation between the time 0 and 24 observations may be large because these observations are taken at the same time of day.  To evaluate this possibility, we conducted a preliminary analysis of the LPS RNA-seq dataset by applying the voom procedure and model \eqref{RMeq1} as in Section~\ref{RMvoomSec}, where  $\boldsymbol{D}_g$ is an $T \times T$  correlation matrix with blocks of the unstructured form \texttt{corSymm}
+
+\[
+\boldsymbol{D}_g =
+\begin{bmatrix}
+1 &  \rho_{g, 1}  & \rho_{g,2}  & \rho_{g,3}\\
+\rho_{g, 1}   &  1 & \rho_{g, 4} & \rho_{g,5}\\
+\rho_{g, 2}   & \rho_{g, 4} & 1 & \rho_{g,6}\\
+\rho_{g,3} &\rho_{g,5} &   \rho_{g,6} & 1
+\end{bmatrix},
+\quad 0 \leq \rho_{g,1}, \dots, \rho_{g,6} \leq 1,
+\]
+instead of the \texttt{corCAR1} form described in Section~\ref{RMvoomSec}. The mean structure of the data is modeled by $\boldsymbol{X}\boldsymbol{\beta}_g $, where the design matrix $\boldsymbol{X}$ is constructed by two factors Time and Line so that there are eight different means, one for each combination of Time and Line.
+\begin{figure}[!tpb]
+\centering
+\includegraphics[width = .4\textwidth]{figure/SampleCorreltion_AllGenes.pdf}
+ \caption{Estimated correlations across all 11911 genes for each pair of time points. The correlation for each gene was estimated by REML using  the function \texttt{gls} in  the \texttt{nlme} R  package applied to the log-transformed LPS RNA-seq data and their precision weights according to the model \eqref{RMeq1}.}
+       \label{RMfigrho}
+\end{figure}
+
+Figure \ref{RMfigrho} shows boxplots of correlations  across all 11911 genes for each pair of time points. Both the average  and median correlations increase across the time pair sequence  (6, 24), (0, 6), (2, 6), (2, 24), (0, 2), (0, 24). This evidence suggests that the circadian rhythm effects on  correlations may be relevant.  In particular, this empirical evidence shows the correlation between time 6 and time 24 observations tends to be  smallest and the correlation between time 0 and time 24 observations tends to be largest. To account for  correlations that are not monotone with time difference on the original time scale,  we propose a remapping procedure of the linear time points to a new time coordinate system so that time 6 and time 24 are farthest apart and other times positioned between them in accordance with the empirical correlation patterns apparent in the data. Without loss of  generality, we consider a mapping of the time points $\{0, 2, 6, 24\}$ to the following new points
+\[
+24 \mapsto d_{24}\equiv 0, \;  6 \mapsto d_6\equiv 1;\; 0 \mapsto d_{0}; \; 2 \mapsto d_{2}, \; 0<d_0,  d_2 < 1.
+\]
+The diagonal block $\boldsymbol{D}_g$ now is
+\begin{align}\label{RMAgnew}
+\boldsymbol{D}_g & =
+\begin{bmatrix}
+1 &  \rho_g^{|d_0 -d_2|}  & \rho_g^{|d_0 -d_6|} & \rho_g^{|d_0 - d_{24}|}\\
+ \rho_g^{|d_2 -d_0|}   &  1 & \rho_g^{|d_2 -d_6|} & \rho_g^{|d_2 - d_{24}|}\\
+\rho_g^{|d_6 -d_0|} & \rho_g^{|d_6 -d_2|} & 1 & \rho_g^{|d_6 - d_{24}|}\\
+\rho_g^{|d_{24} - d_0|}  &   \rho_g^{|d_{24} - d_2|}   &\rho_g^{|d_{24} - d_6|} & 1
+\end{bmatrix}\\
+ & =
+\begin{bmatrix}
+1 &  \rho_g^{|d_0 -d_2|}  & \rho_g^{1-d_0 } & \rho_g^{d_0}\\
+ \rho_g^{|d_2 -d_0|}   &  1 & \rho_g^{1- d_2} & \rho_g^{d_2}\\
+\rho_g^{1 -d_0} & \rho_g^{1 -d_2} & 1 & \rho_g\\
+\rho_g^{d_0}  &   \rho_g^{d_2}   &\rho_g & 1
+\end{bmatrix},
+\quad 0 \leq \rho_g < 1.
+\end{align}
+To estimate appropriate values for $d_0$ and $d_2$, we consider values best supported by REML log likelihood across all genes.
+Let $\ell_g(\sigma^2_g, \rho_g|\boldsymbol{d}:=(d_0, d_2, 1, 0))$ be the REML log likelihood function for data from gene $g$  according to model \eqref{RMeq1} with $\boldsymbol{A}_g$ as defined in \eqref{RMAgnew}. We choose $d_0$ and  $d_2$ to maximize
+\[
+h(\boldsymbol{d}) = \sum_{g = 1}^m \ell_g(\widehat{\sigma}_g^2, \widehat{\rho}_g|\boldsymbol{d}),
+\]
+where $\widehat{\sigma}_g^2$ and  $\widehat{\rho}_g$ are REML estimates of $\sigma^2_g$ and  $\rho_g$, respectively. Using the function \texttt{constrOptim} in the  \texttt{base} R package, we can easily obtain an approximate maximizer of $h(\boldsymbol{d})$ at
+\[
+\hat{d}_0 = 0.26, \hat{d_2} = 0.52.
+\]
+
+In terms of AIC, AIC of the model \eqref{RMeq1} for our choice of $\boldsymbol{D}_g$ (\texttt{corCAR1} using the new time points) is smaller than AIC of that for $\boldsymbol{D}_g = \boldsymbol{I}$, $\boldsymbol{D}_g = \texttt{corSymm}$,   $\boldsymbol{D}_g = \texttt{corCompSymm}$, $\boldsymbol{D}_g = \texttt{corAR1}$ with original time points, $\boldsymbol{D}_g = \texttt{corAR1}$ with new time points and $\boldsymbol{D}_g = \texttt{corCAR1}$ with original time points on average
+66\%, 72\%, 53\%, 68\%, 54\% and 76\% of the genes, respectively. Even though AIC does not guarantee to lead us to the correct correlation structure \citep{Keselman1998}, it still provides useful evidence for choosing a reasonable correlation structure. In this sense, AIC seems to suggest that our choice of correlation structure is superior than  other common correlation structures.
+
+Now we  apply our proposed method to the LPS RNA-seq data using the new time points instead of the original time points. We also compare our results to those obtained by  a variant of our proposed method when $\boldsymbol{D}_g$ has \texttt{corSymm} correlation structure and the popular RNA-seq analysis methods -- voom, DESeq2 and edgeR -- which ignore correlation among observations. Fig. \ref{RMfigkr} summarizes the analysis results of these methods when  FDR is nominally controlled at 5\%. Recall that both DESeq2  and edgeR methods utilize  negative binomial generalized linear models.  DESeq2 uses shrinkage estimation for dispersion parameters and fold changes to improve the stability and interpretability of estimates, while edgeR employs its own version of 
+shrinkage estimation for dispersion parameters and does not shrink log fold change estimates. To conduct inference about the contrasts of interest, we use likelihood ratio test in DESeq2 and the quasi-likelihood $F$-test in edgeR. It is clear from the Venn diagrams  in Figure \ref{RMfigkr} that our proposed method, bootCAR1, detects the smallest number of DE genes with respect to the Line main effect, and detects the largest number of DE genes for the tests that involve the time factor. The differences between our proposed method and the others can be explained due to the fact that voom, DESeq2 and edgeR tend to  underestimate the covariances between observations measured at different time points, and therefore overestimate the variances of differences between these observations, as well as underestimate the variances of averages of these observations. This  leads us  to the situation that the three methods voom, DESeq2, and edgeR may have an excessive number of large  values of test statistics for the Line main effect, while have  an inadequate number of small values of test statistics that involve the time factor. 
+
+\begin{figure}[!tpb]
+\centering
+\includegraphics[width = .4\textwidth]{figure/VennDiagramRFI_Time024.pdf}
+ \caption{Venn diagrams showing numbers of DE genes (FDR is nominally controlled at $0.05$) with respect to nine  effects when analyzing the LPS RNA-seq dataset using five methods: voom, edgeR, DESeq2, bootSymm,  and bootCAR1.}
+       \label{RMfigkr}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Simulation Study}\label{RMss}
+
+We considered two simulation scenarios, corCAR1 and corSymm, described in detail in Sections \ref{RMss1},  and \ref{RMss2}, respectively. In each scenario, bootCAR1, bootSymm, voom, egdeR, and DESeq2 are compared in terms of their ability to identify DE genes while controlling FDR. Such comparisons require simulated datasets to contain both EE and DE genes with respect to a contrast of interest.  Within each scenario, we consider three  contrasts: 1) \texttt{Line}: the  main effect of Line factor, 2) \texttt{Time}: the main effect of Time factor,  and 3) \texttt{Interaction}: the interaction between line and time factors.
+
+For each scenario and  contrast, we simulated 50 datasets. Each dataset included read counts for 8 pigs at 4 time points and 5000 genes. The read counts were simulated based on \eqref{RMlogcpm} and \eqref{RMeq1} for scenarios described in Section \ref{RMss1} and \ref{RMss2}, where the \texttt{corCAR1} correlation structure was used in the \texttt{corCAR1} scenario, and the general correlation corSymm structure was used in the \texttt{corSymm} scenario.
+
+
+We want to emphasize that our simulation study considers three contrasts of interest. This is different from most simulation studies where only two-group comparison is considered to evaluate the performance of a differential expression analysis method.  Our simulation setting allows us to fully investigate effects of within-unit correlation on the inference of within-subject and between-subject contrasts. The analysis in Section~\ref{RMdataanalysis} showed that a method ignoring within-unit correlation tends to overestimate the variance of a within-subject contrast and underestimate the variance of a between-subject contrast, which may be inefficient for inference of both within-subject and between-subject contrasts. 
+
+\subsection{Simulation Scenario 1:  \texttt{corCAR1} Correlation Structure}\label{RMss1}
+The first simulation scenario provides a favorable case for our proposed method in which the read counts were simulated from the working model assumptions \eqref{RMlogcpm} and \eqref{RMeq1} with \texttt{corCAR1} correlation structure. As true parameter values for simulating new data, for each gene, we used the normalization offsets  $R_{it}$, the  estimates of the precision weight matrix $\boldsymbol{W}_g$, the correlation parameter  $\rho_g$, and the regression coefficients $\boldsymbol{\beta}_g$ from the fit of the model \eqref{RMeq1} to the LPS RNA-seq dataset, except that we set partial regression coefficients corresponding to the contrast of interest to zero for a subset of genes to permit simulation of EE genes with respect to the contrast of interest. More specifically, 5955 least significant partial regression coefficients for the contrast of interest were set to zero. This strategy yielded a parameter set (consisting of the  normalization offsets $R_{it}$, the precision weight matrix $\boldsymbol{W}_g$,  the correlation parameter $\widehat{\rho}_g$, and  regression coefficients $\boldsymbol{\beta}_g$) for each of 5955 EE genes, 11911 - 5955 = 5956 DE genes and a given contrast. To simulate any particular dataset for a given contrast of interest, we randomly sampled 4000 parameter sets from the EE genes and 1000 parameter sets from the DE genes. The selected parameter sets  and the design matrix constructed by the linear combination of  Time, Line, and Line $\times$ Time for 32 samples were used to simulate a 5000 $\times$ 32 dataset of read counts by first simulating log-transformed data using formula \eqref{RMeq1}, then converting the  log-transformed data back to read counts using formula \eqref{RMlogcpm}. Random selection of parameter sets and generation of data was independently repeated 50 times to obtain 50 datasets for each one of the four contrasts of interest: \texttt{Line}, \texttt{Time}, \texttt{Interaction}.
+
+\subsection{Simulation Scenario 2:  \texttt{corSymm} Correlation Structure}\label{RMss2}
+The second simulation scenario is designed to evaluate our proposed method when, contrary to our working model assumptions, the read counts were generated  from the working model assumptions \eqref{RMlogcpm} and \eqref{RMeq1} but with the general correlation \texttt{corSymm} structure. This scenario slightly violates our working model assumptions in the sense that the correlation structure was misspecified. In this  scenario, each dataset was simulated using exactly the same procedure described in Section~\ref{RMss1}, except that the within-gene correlation structure  was set to be the general correlation \texttt{corSymm} structure.
+
+
+\subsection{Simulation Results}
+We analyzed simulated datasets from  two simulation scenarios using  bootCAR1, bootSymm -- the method similar to our proposed method bootCAR1 using a general correlation corSymm structure,  voom, edgeR, DESeq2, oracle -- the method that uses true correlation and unshrunken error variance, and oracle\_shrunken -- the method that uses true correlation  and shrunken error variance. Of course, the two oracle procedures cannot be used in practice, but their inclusion provides a useful reference measure of the performance achieved if the within-gene correlations were known. 
+
+For all seven analysis methods, $p$-value for testing the significance of the partial regression coefficients on the contrast of interest was calculated for each gene. These $p$-values were converted to $q$-values as described in Section~\ref{RMgeneraltest}, and genes with $q$-values no larger than 0.05 were declared to be DE. Using these $p$-values and $q$-values, we evaluated each method's performance based on four criteria: the relationship between empirical distribution of true null $p$-values and the uniform(0,1) distribution,  the incurred FDR when FDR is nominally controlled at 5\%, the number of true positive (NTP)  detections of differential expression, and the partial area under the receiver operating characteristic curve (PAUC) corresponding to false positive rates (FPR) less than or equal to 0.05. These performance criteria assess the validity of $p$-values, FDR  control, power, and the ability to distinguish EE and DE genes from one another.
+
+All simulation results in terms of the first criterion are displayed in  Figures  \ref{RMfig2} and \ref{RMfig8}. In  simulation scenario 1 when data were generated using our working model with the \texttt{corCAR1} correlation structure,  the empirical quantiles of the null $p$-values of fourth methods bootCAR1, bootSymm, oracle, and oracle\_shrunken  are  very similar to the uniform(0,1) quantiles in all four contrasts of interest.  On the other hand, the null $p$-values of voom, edgeR, and DESeq2 are very liberal for  \texttt{Line} main effect,  among the three methods,  DESeq2 results in the most liberal null $p$-values. For the other two contrasts \texttt{Time} and  \texttt{Interaction}, voom and  edgeR give very conservative $p$-values, while DESeq2 gives liberal ones.  In the simulation scenario 2 when data were generated using  \texttt{corSymm} correlation structure,  the empirical quantiles of the null $p$-values of  methods bootSymm, oracle, and oracle\_shrunken  are  very similar to the uniform(0,1) quantiles in all four contrasts of interest. The empirical quantiles of the null $p$-values of bootCAR1 is also similar to the uniform(0,1) quantiles, but slightly liberal for small $p$-values in all contrasts. voom, edgeR, DESeq2 also give liberal $p$-values.
+
+
+The behavior of null $p$-values of all methods can be explained as follows. When within-gene correlations exist, as demonstrated in  simulation scenario 1, the methods  voom, edgeR and DESeq2  do not take within-unit correlation into account, therefore, they tend to underestimate the variances of between-subject contrasts such as  \texttt{Line} main effect, therefore, inflate the corresponding test statistics values,  resulting in  liberal $p$-values. These methods also overestimate the variances of within-subject contrasts such as  \texttt{Time} and \texttt{Interaction}, therefore deflate these  test statistics values, resulting in  conservative $p$-values. 
+
+\begin{figure}[!tpb]
+\centering
+\includegraphics[width = .4\textwidth]{figure/PlotQuantile50.png}
+ \caption{A plot of quantiles of null $p$-values versus quantiles of the uniform(0,1) distribution for all methods and contrasts in two  simulation scenarios. Each line represents the quantiles from a single simulation, the diagonal line represents the quantiles of the  uniform(0,1) distribution.}
+       \label{RMfig2}
+\end{figure}
+ 
+\begin{figure}[!tpb]
+\centering
+\includegraphics[width = .4\textwidth]{figure/PlotQuantile5010.png}
+ \caption{A plot of  the less-than-10\% quantiles of null $p$-values versus the less-than-10\% quantiles of the uniform(0,1) distribution for all methods and contrasts in two simulation scenarios. Each line represents the less-than-10\% quantiles from a single simulation, the diagonal line represents the the less-than-10\% quantiles of the  uniform(0,1) distribution.}
+       \label{RMfig8}
+\end{figure}
+
+The simulation results in terms of FDR control are summarized in  Figure \ref{RMfig5}. In the  simulation scenario 1, bootCAR1 is able to control FDR well for all three contrasts; bootSymm also controls FDR conservatively for all three contrasts; while voom, edgeR and DESeq2 fail to control FDR for \texttt{Line} main effect with extremely high incurred FDR. For the other two contrasts \texttt{Time} and \texttt{Interaction},  voom and edgeR are able to control FDR conservatively; meanwhile DESeq2 fails to control FDR for all three contrasts. In the \texttt{corSymm} simulation scenario, all methods fail to control FDR except bootSymm which controls FDR conservatively in the contrasts \texttt{Line} and \texttt{Interaction}, and controls FDR well in the contrast \texttt{Time}. Among those methods that fail to control FDR, bootCAR1 is the least liberal in the contracts \texttt{Line} and \texttt{Interaction}, while voomlimma is the least liberal in the contrast \texttt{Time}.  In all simulation scenarios, among the three methods voom, edgeR and  DESeq2,  DESeq2 gives the most liberal incurred FDR.
+
+
+\begin{figure}[!tpb]
+\centering
+\includegraphics[width = .4\textwidth]{figure/FDR_SimPlot_Time024.png}
+ \caption{Boxplots of the incurred FDR when FDR is nominally controlled at 0.05 for all methods and all contrasts in two simulation scenarios. Each boxplot has 50 data points representing  50 simulated datasets.}
+       \label{RMfig5}
+\end{figure}
+
+
+The simulation results in terms of PAUC, the ability to distinguish DE and EE genes from one another, are presented in Figure \ref{RMfig6}. For all contrasts, bootCAR1 outperforms all alternatives  except bootSymm in the \texttt{corSymm} simulation scenario with contrasts \texttt{Line} and \texttt{Interaction}.  In all simulation scenarios, DESeq2 is the worst method in terms of PAUC among three methods voom, edgeR and DESeq2.
+
+\begin{figure}[!tpb]
+\centering
+\includegraphics[width = .4\textwidth]{figure/PAUC_SimPlot_Time024.png}
+ \caption{Boxplots of the  partial area under the receiver operating characteristic curve  (PAUC) when false positive rate is less than or equal to 0.05 for all methods and all  contrasts in two simulation scenarios. Each boxplot has 50 data points representing  50 simulated datasets.}
+       \label{RMfig6}
+\end{figure}
+The simulation results in terms of power are shown in Figure \ref{RMfig7}. Since many methods  fail to control FDR in many cases, it is hard to evaluate their power in all cases. For the contrast \texttt{Time} and \texttt{Interaction} in the simulation scenario 1 when bootCAR1, bootSymm, voom, and edgeR  control FDR, it is clear that bootCAR1 is the most powerful method.
+\begin{figure}[!tpb]
+\centering
+\includegraphics[width = .4\textwidth]{figure/NTP_SimPlot_Time024.png}
+% \centerline{\includegraphics{figure/NTP_SimPlot_Time024.png}}
+ \caption{Boxplots of number of true positive (NTP) detections  when FDR is nominally controlled at 0.05 for all methods and all  effects in two simulation scenarios. Each boxplot has 50 data points representing 50 simulated datasets.}
+       \label{RMfig7}
+\end{figure}
+\section{Discussion}\label{RMdiscussion}
+The proposed method bootCAR1 provides a practical tool for identifying DE genes using RNA-seq data from  repeated-measures designs. The  idea is to use normalized log-counts and their associated precision weights in a general linear model pipeline for estimation,  and then employ a parametric bootstrap procedure for hypothesis testing. Correlation among observations within each gene is accounted for using the continuous autoregressive correlation structure \texttt{corCAR1}.   Under our working model assumptions, simulation studies show the advantages of our method compared to the alternatives  that do not account for the within-gene correlation induced by the repeated-measures structure. In particular, our method outperforms the alternatives that do not consider correlation among observations within gene in terms of FDR control and the ability to distinguish EE  and DE genes from one another. 
+Our method suffers when the correlation structure is \texttt{corSymm} as shown in the simulation scenario \ref{RMss2}. However, even in this situation, our method bootCAR1 is still better than bootSymm in terms of power because bootSymm even though uses true correlation structure, its power is very weak.  Our method is implemented in an R package available at \href{https://github.com/ntyet/tcrmrnaseq}{https://github.com/ntyet/tcrmrnaseq}.
+
+The parametric bootstrap inference approach proposed in our paper can be easily extended to other RNA-seq  designs that may contain factors whose effects are best modeled as random thanks to the simple and straightforward application of linear model using normalized log-counts data. We also expect that the inference approach behaves well in such situations.
+
+Our method is computationally intensive due to its utilization of a parametric bootstrap procedure to make  inference. Our implementation of bootCAR1 method in the \texttt{R} package \texttt{tcrmrnaseq}  use parallelization to speed up the algorithm. Using 16 cores computer in parallel, it takes about 3 hours to analyze 11911 genes of the LPS RNA-seq dataset. In a personal laptop with 4 cores, it takes about 12 hours for  such an analysis.
+
+It is worth to recall that our proposed method is not the only  one that can account for the within-gene correlation among observations in the analysis of RNA-seq data or any other omic-count data. There are several other options that within-gene correlations can be handled.
+
+First, one may use negative binomial or Poisson generalized linear mixed  model, for examples, see \citet{sun2016}, \citet{zhang2017}.  \citet{sun2016}  developed a negative binomial GLMM framework to analyze a time-course RNA-seq experiment at exon level, where they used smoothing spline to model time effect and group effect, and a random effect to model time dependency. However, the random effect does not reflect the general unequally spaced time point situation as shown in our motivating data example.
+On the other hand, \citet{zhang2017} also proposed a negative binomial GLMM for microbiome data to detect significant taxa with respect to a factor of interest accounting for correlation among samples. The sample size in their working dataset is about several hundreds samples, which is not a typical sample size in RNA-seq experiments. Also, from our experience, a regular GLMM fit in RNA-seq context with the autoregressive correlation structure as in our motivating data example has shown to be numerically unstable, because it fails to converge for many genes.
+
+Second, other approach is to use Kenward-Roger's method (KR) for normalized log-counts data in a general linear model framework. However, our extra simulation studies show KR method does not work well in RNA-seq data with the considered modeling assumption in terms of FDR control.
+
+In conclusion, our proposed method works well under the general linear model framework compared to other alternative approaches. Moreover, our approach can be extended to other complex designs that may contain factors whose effects are best modeled as random.  
+
+\section*{ Acknowledgments}
+This material is based upon work supported by Agriculture and Food Research Initiative Competitive Grant No.\ 2011-68004-30336 from the United States Department of Agriculture (USDA) National Institute of Food and Agriculture (NIFA), and by National Institute of General Medical Sciences (NIGMS) of the National Institutes of Health (NIH) and the joint National Science Foundation (NSF)/NIGMS Mathematical Biology Program under award number R01GM109458. The opinions, findings, and conclusions stated herein are those of the authors and do not necessarily reflect those of USDA, NSF, or NIH.
+
+\bibliographystyle{natbib}
+\bibliography{mybib}
+
+\end{document}
