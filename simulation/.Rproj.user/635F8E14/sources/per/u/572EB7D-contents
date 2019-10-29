@@ -1,9 +1,0 @@
-library(tinytex)
-tlmgr_search('/fontenc.sty')   # search for times.sty
-tlmgr_install('fontenc')      # install the psnfss package
-tlmgr_update() 
-
-system2('updmap-sys'
-
-        tinytex::reinstall_tinytex()        
-        
