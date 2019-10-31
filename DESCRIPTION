@@ -2,12 +2,18 @@ Package: rmRNAseq
 Type: Package
 Title: RNA-Seq Analysis for Repeated-Measures Data
 Version: 0.1.0
-Authors@R: person("Yet", "Nguyen", email = "tienyettoan@gmail.com",
-  role = c("aut", "cre"))
+Authors@R: c(person("Yet", "Nguyen", email = "tienyettoan@gmail.com", role = c("aut", "cre")),
+    person("Dan", "Nettleton",  role = "aut"), 
+    person(c("Charity", "Gordon"), c("Law", "Smyth"), role = "ctb", 
+    comment = "The authors of limma::voom, which was modified slightly leading to my_voom"),
+    person("Agata", "Michna", role = "ctb", 
+    comment = "The author of splineTimeR::splineDiffExprs, which was modified slightly leading to my_splineDiffExprs")
+    )
 Description: A differential expression analysis method for RNA-seq data from repeated-measures design 
     using general linear model framework and parametric bootstrap inference. The method accounts for 
     the dependence of gene expression levels due to the repeated-measures through continuous autoregressive 
-    correlation structure.  
+    correlation structure. The method is described in Chapter 4 of 
+    Nguyen <https://lib.dr.iastate.edu/cgi/viewcontent.cgi?article=7433&context=etd>.  
 Depends: R (>= 3.3)
 biocViews:
 Imports:
@@ -28,7 +34,7 @@ Imports:
     splineTimeR,
     statmod (>= 1.4.29),
     stats
-License: GPL-2
+License: GPL (>=2)
 LazyData: true
 RoxygenNote: 6.1.1
 Suggests: knitr,
