@@ -1,6 +1,6 @@
 ## Resubmission
 This is a resubmission. In this version I have:
-* fixed typo in the CRAN URL
+* fixed typo CRAN URL link in the README.md file
 
 ## Resubmission
 This is a resubmission. In this version I have:
