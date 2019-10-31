@@ -27,7 +27,7 @@ install.packages("rmRNAseq")
 ```
 
 (The package has just been submitted to
-[CRAN](https::/CRAN.R-project.org) on June 26, 2019; it usually takes
+[CRAN](https://CRAN.R-project.org) on June 26, 2019; it usually takes
 about 10 days to receive their feedback.)
 
 And the development version from [GitHub](https://github.com/) with:

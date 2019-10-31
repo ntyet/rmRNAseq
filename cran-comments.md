@@ -1,5 +1,9 @@
 ## Resubmission
 This is a resubmission. In this version I have:
+* fixed typo in the CRAN URL
+
+## Resubmission
+This is a resubmission. In this version I have:
 
 * provided reference describing the method in the description field of DESCRIPTION file
 * added all authors (no copyright holders except me) in the Authors@R field with the appropriate roles
