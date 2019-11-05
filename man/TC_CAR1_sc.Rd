@@ -52,6 +52,7 @@ using  methods: \code{\link{TC_CAR1}},
 , \code{\link{DESeq2Fit}}.
 }
 \examples{
+\donttest{
 data(res)
 data(resSymm)
 data(design)
@@ -68,5 +69,5 @@ print.progress=FALSE; saveboot <- FALSE;
 TC_Symm_scOut <- rmRNAseq:::TC_CAR1_sc(RFIanalysis, scenario,  EE, DE,  C.matrix,
 Subject, Time,  Nboot,  nrep, ncores, name_dir_sim , print.progress, saveboot)
 names(TC_Symm_scOut)
-
+}
 }
