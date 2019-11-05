@@ -27,6 +27,7 @@
 #' @importFrom reshape melt
 #' @importFrom stats coef model.matrix quantile vcov
 #' @examples
+#' \donttest{
 #' data(res)
 #' data(resSymm)
 #' data(design)
@@ -43,7 +44,8 @@
 #' TC_Symm_scOut <- rmRNAseq:::TC_CAR1_sc(RFIanalysis, scenario,  EE, DE,  C.matrix,
 #' Subject, Time,  Nboot,  nrep, ncores, name_dir_sim , print.progress, saveboot)
 #' names(TC_Symm_scOut)
-#'
+#' }
+
 TC_CAR1_sc <- function(RFIanalysis, scenario,  EE, DE,  C.matrix, Subject, Time,
                              Nboot,  nrep, ncores, name_dir_sim = NULL, print.progress=F,
                              saveboot = FALSE){
