@@ -1,6 +1,6 @@
 ## Resubmission
 This is a resubmission. In this version I have:
-* wrapped the example of the function TC_CAR1_sc inside \donttest
+* wrapped the (working) example of the function TC_CAR1_sc inside \donttest
   to avoid NOTE about elapsed time (> 10s)
 
 ## Resubmission
