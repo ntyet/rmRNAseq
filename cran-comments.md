@@ -1,9 +1,10 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 * added the publication year to reference in the Description field of DESCRIPTION file
-* included toy runable examples for main functions TC_CAR1 and TC_CAR1_sc
+* included toy runable examples for the main function TC_CAR1
 * set name_dir_sim = NULL in the example of the function sc_TC_CAR1 
-  so that the function does not modify the user's home directory 
+  so that the function does not modify the user's home directory. 
+  This example is set to donttest since its elapsed time > 5s
 * replaced all cat() by message()
 
 
