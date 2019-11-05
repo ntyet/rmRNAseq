@@ -36,9 +36,9 @@ glsSymm <- function(d) {
   cnt <- 0
   repeat {
     cnt <- cnt + 1
-    # cat(cnt, '\n')
+    # message(cnt, '\n')
     if (cnt > 100) {
-      # cat(cnt, '\n')
+      # message(cnt, '\n')
       stop("Too many loops, cnt >100")
     }
     glsout <- tryCatch(nlme::gls(stats::as.formula(paste0("y~0+", paste0(colnames(d)[-c(1:4)],
@@ -109,7 +109,7 @@ voomgls_Symm <- function(v, Subject, Time, ncores=1, C.matrix = NULL, beta0=NULL
       # print(i)
       d <- data.frame(cbind(y = v$E[i, ], Subject = Subject, Time = Time, w = 1/W[i,
                                                                                   ], design))
-      cat('\n Analyzing gene = ', i, '\n')
+      message('\n Analyzing gene = ', i, '\n')
       glsSymm(d)
     }, mc.cores = ncores)
   }else{
@@ -333,9 +333,9 @@ glsCAR1 <- function(d) {
   cnt <- 0
   repeat {
     cnt <- cnt + 1
-    # cat(cnt, '\n')
+    # message(cnt, '\n')
     if (cnt > 100) {
-      # cat(cnt, '\n')
+      # message(cnt, '\n')
       stop("Problem with glsCAR1, too many loops, cnt >100")
     }
     glsout <- tryCatch(nlme::gls(stats::as.formula(paste0("y~0+", paste0(colnames(d)[-c(1:4)],
@@ -419,7 +419,7 @@ voomgls_CAR1 <- function(v, Subject, Time, ncores=1, C.matrix, beta0=NULL, print
       # print(i)
       d <- data.frame(cbind(y = v$E[i, ], Subject = Subject, Time = Time, w = 1/W[i,
                                                                                   ], design))
-      # cat('\n Analyzing gene = ', i, '\n')
+      # message('\n Analyzing gene = ', i, '\n')
       glsCAR1(d)
     }, mc.cores = ncores)
   }else{
@@ -503,9 +503,9 @@ glsCAR1_loglik <- function(d){
   cnt <- 0
   repeat{
     cnt <- cnt+1
-    # cat(cnt, "\n")
+    # message(cnt, "\n")
     if(cnt >100){
-      # cat(cnt, "\n")
+      # message(cnt, "\n")
       stop("Problem with glsCAR1, loop take too long time, cnt >100")
     }
     glsout <- tryCatch(nlme::gls(stats::as.formula(paste0("y~0+", paste0(colnames(d)[-c(1:4)], collapse = "+"))),
@@ -646,7 +646,7 @@ sc_CAR1 <- function(BetaMat, Sigma2Vec, RhoVec, WeightMat, lib.size, design, Sub
       diag(sqrt(1/WeightMat[i, ]))
     cnt <- 1
     repeat {
-      #cat(cnt, '\n')
+      #message(cnt, '\n')
       epsilon <- MASS::mvrnorm(n = 1, mu = rep(0, nrow(design)), Sigma = V)  # library(MASS)
       # out <- unname(round(2^(Xbeta + epsilon) * (lib.size + 1)/10^6)[, , drop = T])
       out <- round(pmax(0,as.numeric(2^(Xbeta + epsilon) * (lib.size + 1)/10^6)))
@@ -684,7 +684,6 @@ sc_CAR1 <- function(BetaMat, Sigma2Vec, RhoVec, WeightMat, lib.size, design, Sub
 #'   approach, using \code{\link{jabes.q}} function.}
 #' @references Yet Nguyen, Dan Nettleton, 2019. rmRNAseq: RNA-seq Analysis for Repeated-measures Data.
 #' @examples
-#' \donttest{
 #' # This example shows how to implement the method using LPS RFI data.
 #' data(dat)
 #' data(design)
@@ -707,17 +706,17 @@ sc_CAR1 <- function(BetaMat, Sigma2Vec, RhoVec, WeightMat, lib.size, design, Sub
 #' names(TCout)
 #' TCout$pqvalue$pv
 #' TCout$pqvalue$qv
-#' }
+#'
 #' @export
 
 
 TC_CAR1 <- function(counts, design, Subject, Time, C.matrix, Nboot = 100, ncores = 1, print.progress = F, saveboot = FALSE) {
-  # cat("Analyzing data using voomgls \n")
+  # message("Analyzing data using voomgls \n")
 
   v <- myvoom(counts = counts, design = design, lib.size = apply(counts, 2, stats::quantile,
                                                                  0.75), plot = F)
   # Estimate new time point
-  # cat("Estimate new time point \n")
+  # message("Estimate new time point \n")
   tmOut <- TimeMin(v, Subject, Time, ncores)
   TimeMinOut <-tmOut$MinMaxTime
   ntp <- NewTimeEst(v, Subject, Time, TimeMinOut, ncores)
@@ -741,12 +740,12 @@ TC_CAR1 <- function(counts, design, Subject, Time, C.matrix, Nboot = 100, ncores
   WeightMat <- v$weights
   lib.size <- v$targets$lib.size
 
-  # cat("Analyzing bootstrap data using voomgls \n")
+  # message("Analyzing bootstrap data using voomgls \n")
   bootres <- parallel::mclapply(1:Nboot, function(nrep){
     # if (print.progress)
-    cat("running bootstrap sample nrep = ", nrep, "\n")
+    message("running bootstrap sample nrep = ", nrep, "\n")
 
-    cat("---------------------------------------------\n")
+    message("---------------------------------------------\n")
 
     simcounts <- sc_Symm(BetaMat = BetaMat, Sigma2Vec = Sigma2Vec, RhoVec = RhoVec, WeightMat = WeightMat,
                          lib.size = lib.size, design = design, Subject = Subject, Time = Time, nrep = nrep)
@@ -760,19 +759,19 @@ TC_CAR1 <- function(counts, design, Subject, Time, C.matrix, Nboot = 100, ncores
 
 
     # if (print.progress)
-    # cat("finishing bootstrap sample nrep = ", nrep, "\n")
+    # message("finishing bootstrap sample nrep = ", nrep, "\n")
 
     cbind(simcounts, bootlm)
     # bootlm
 
   }, mc.cores = 1)
-  # cat("finishing analysis of all bootstrap samples \n")
+  # message("finishing analysis of all bootstrap samples \n")
   # node.error <- which(lapply(bootres, class) == "try-error")
   # if (length(node.error) != 0) {
   #   bootres <- res[lapply(bootres, class) != "try-error"]
-  #   cat("cores have error occured: ", node.error, "\n")
+  #   message("cores have error occured: ", node.error, "\n")
   # } else {
-  #   # cat("all cores work fine! \n")
+  #   # message("all cores work fine! \n")
   # }
   # calculating pvalue for all gene and all test in C.matrix components
   pvboot <- vapply(grep(pattern = "Ftest", names(newlm0), value = T), function(x) {
@@ -785,7 +784,7 @@ TC_CAR1 <- function(counts, design, Subject, Time, C.matrix, Nboot = 100, ncores
     pv <- do.call("c", pv)
     pv
   }, FUN.VALUE = rep(1, nrow(counts)))
-  # cat("Finishing calculation of p-values and q values\n")
+  # message("Finishing calculation of p-values and q values\n")
   pvboot <- data.frame(pvboot)
   names(pvboot) <- gsub("Ftest.", "", names(pvboot))
   qvboot <- data.frame(vapply(pvboot, function(x) jabes.q(x), FUN.VALUE = rep(1, nrow(counts))))
@@ -801,9 +800,9 @@ TC_CAR1 <- function(counts, design, Subject, Time, C.matrix, Nboot = 100, ncores
                                           # boot.res = bootres,
                                           pqvalue = pqvalue)
                             }
-  # cat("# p.05 of each test \n")
+  # message("# p.05 of each test \n")
   # print(apply(pqvalue$pv <= 0.05, 2, sum))
-  # cat("\n # q.05 of each test \n")
+  # message("\n # q.05 of each test \n")
   # print(apply(pqvalue$qv <= 0.05, 2, sum))
   return(res)
 }

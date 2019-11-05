@@ -27,21 +27,22 @@
 #' @importFrom reshape melt
 #' @importFrom stats coef model.matrix quantile vcov
 #' @examples
-#' \donttest{
+#' data(res)
 #' data(resSymm)
 #' data(design)
 #' data(covset)
+#' RFIanalysis <- list(CAR1 = res, Symm = resSymm)
 #' C.matrix <- list()
 #' # test for Line main effect
 #' C.matrix[[1]] <- limma::makeContrasts(line2, levels = design)
 #' names(C.matrix) <- c("line2")
-#' EE <- 10; DE <- 5; ncores <- 1; Subject <- covset$ear;
-#' Time <- covset$time; Nboot <- 2; nrep <- 1; name_dir_sim <- "Output/MisspecifiedCased";
-#' print.progress=F
-#' TC_Symm_scOut <- rmRNAseq:::TC_CAR1_sc(resSymm,  EE, DE,  C.matrix,
-#' Subject, Time,  Nboot,  nrep, ncores, name_dir_sim , print.progress)
+#' scenario <- 1; EE <- 3; DE <- 2; ncores <- 1; Subject <- covset$ear;
+#' Time <- covset$time; Nboot <- 2; nrep <- 1;
+#' name_dir_sim <- NULL
+#' print.progress=FALSE; saveboot <- FALSE;
+#' TC_Symm_scOut <- rmRNAseq:::TC_CAR1_sc(RFIanalysis, scenario,  EE, DE,  C.matrix,
+#' Subject, Time,  Nboot,  nrep, ncores, name_dir_sim , print.progress, saveboot)
 #' names(TC_Symm_scOut)
-#' }
 #'
 TC_CAR1_sc <- function(RFIanalysis, scenario,  EE, DE,  C.matrix, Subject, Time,
                              Nboot,  nrep, ncores, name_dir_sim = NULL, print.progress=F,
@@ -120,29 +121,29 @@ TC_CAR1_sc <- function(RFIanalysis, scenario,  EE, DE,  C.matrix, Subject, Time,
   simout <-  list(sim.counts = simcounts, sim.sample = sim.sample)
 
   ## Reestimate time points
-  cat("--------------------------------------\n")
+  message("--------------------------------------\n")
 
-  cat("Analyzing simcounts using TC-CAR1 \n")
+  message("Analyzing simcounts using TC-CAR1 \n")
 
   resCAR1Symm <- TC_CAR1(counts = simcounts, design = design,
                               Subject = Subject, Time = Time,  C.matrix,
                               Nboot = Nboot,  ncores = ncores, print.progress, saveboot)
-  cat("--------------------------------------\n")
+  message("--------------------------------------\n")
 
-  cat("Analyzing simcounts using voomlimma \n")
+  message("Analyzing simcounts using voomlimma \n")
 
   voomlimmaout <- voomlimmaFit(simcounts, design, names(C.matrix))
-  cat("--------------------------------------\n")
+  message("--------------------------------------\n")
 
-  cat("Analyzing simcounts using edgeR \n")
+  message("Analyzing simcounts using edgeR \n")
 
   edgeRout <- edgeRFit(simcounts, design, names(C.matrix))
-  cat("--------------------------------------\n")
+  message("--------------------------------------\n")
 
-  cat("Analyzing simcounts using DESeq2 \n")
+  message("Analyzing simcounts using DESeq2 \n")
 
   DESeq2out <- suppressMessages(DESeq2Fit(simcounts, design, names(C.matrix)))
-  cat("--------------------------------------\n")
+  message("--------------------------------------\n")
 
   ressim <- list(simout = simout,
     resCAR1Symm=resCAR1Symm,

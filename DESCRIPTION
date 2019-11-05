@@ -13,7 +13,7 @@ Description: A differential expression analysis method for RNA-seq data from rep
     using general linear model framework and parametric bootstrap inference. The method accounts for 
     the dependence of gene expression levels due to the repeated-measures through continuous autoregressive 
     correlation structure. The method is described in Chapter 4 of 
-    Nguyen <https://lib.dr.iastate.edu/cgi/viewcontent.cgi?article=7433&context=etd>.  
+    Nguyen (2018) <https://lib.dr.iastate.edu/cgi/viewcontent.cgi?article=7433&context=etd>.  
 Depends: R (>= 3.3)
 biocViews:
 Imports:

@@ -1,5 +1,14 @@
 ## Resubmission
 This is a resubmission. In this version I have:
+* added the publication year to reference in the Description field of DESCRIPTION file
+* included toy runable examples for main functions TC_CAR1 and TC_CAR1_sc
+* set name_dir_sim = NULL in the example of the function sc_TC_CAR1 
+  so that the function does not modify the user's home directory 
+* replaced all cat() by message()
+
+
+## Resubmission
+This is a resubmission. In this version I have:
 * fixed typo CRAN URL link in the README.md file
 
 ## Resubmission

@@ -42,7 +42,6 @@ This function implements our  parametric bootstrap to analyze
 repeated measures RNA-seq data.
 }
 \examples{
-\donttest{
 # This example shows how to implement the method using LPS RFI data.
 data(dat)
 data(design)
@@ -65,7 +64,7 @@ Nboot, ncores, print.progress, saveboot)
 names(TCout)
 TCout$pqvalue$pv
 TCout$pqvalue$qv
-}
+
 }
 \references{
 Yet Nguyen, Dan Nettleton, 2019. rmRNAseq: RNA-seq Analysis for Repeated-measures Data.
