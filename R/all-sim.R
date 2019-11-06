@@ -15,7 +15,7 @@
 #' @param RFIanalysis the output from RFI RNA-seq dataset. In the ideal simulation case,
 #' it is res from TC_CAR1, in the  misspecified case, it is res from TC_Symm
 #' @param scenario either 2- 'Symm' or 1- 'CAR1'
-#' @param saveboot TRUE or FALSE to save or not save bootstrap output
+#' @param saveboot \code{TRUE} or \code{FALSE} to save or not save bootstrap output
 #' @param Subject a vector of subjects or experimental units.
 #' @param Time a vector of time points.
 #' @param C.matrix is a list of matrix Ci in testing H0:  Ci*beta = 0.
@@ -40,14 +40,14 @@
 #' scenario <- 1; EE <- 3; DE <- 2; ncores <- 1; Subject <- covset$ear;
 #' Time <- covset$time; Nboot <- 2; nrep <- 1;
 #' name_dir_sim <- NULL
-#' print.progress=FALSE; saveboot <- FALSE;
+#' print.progress <- FALSE; saveboot <- FALSE;
 #' TC_Symm_scOut <- rmRNAseq:::TC_CAR1_sc(RFIanalysis, scenario,  EE, DE,  C.matrix,
 #' Subject, Time,  Nboot,  nrep, ncores, name_dir_sim , print.progress, saveboot)
 #' names(TC_Symm_scOut)
 #' }
 
 TC_CAR1_sc <- function(RFIanalysis, scenario,  EE, DE,  C.matrix, Subject, Time,
-                             Nboot,  nrep, ncores, name_dir_sim = NULL, print.progress=F,
+                             Nboot,  nrep, ncores, name_dir_sim = NULL, print.progress=FALSE,
                              saveboot = FALSE){
   if(!is.null(name_dir_sim)) dir.create(name_dir_sim, showWarnings = FALSE, recursive = TRUE)
   Cmatrixseed <- c(1, 2)
@@ -57,14 +57,14 @@ TC_CAR1_sc <- function(RFIanalysis, scenario,  EE, DE,  C.matrix, Subject, Time,
     set.seed(Cmatrixseed[names(C.matrix)]*10^7 + nrep)
     design <- res$ori.res$v$design
     pv <- res$pqvalue$pv[,names(C.matrix)]
-    sortline <- sort(pv, index.return = T)
+    sortline <- sort(pv, index.return = TRUE)
     DEline.ind <- sortline$ix[1:(length(pv)/2)]
     EEline.ind <- setdiff(1:length(pv), DEline.ind)
     coefbeta <- res$ori.res$newlm[,grep("fixed.", names(res$ori.res$newlm))]
     colnames(coefbeta) <- gsub("fixed.", "", colnames(coefbeta))
     coefbeta[EEline.ind, colnames(C.matrix[[1]])]  <- 0
-    DE.sample <- sample(DEline.ind, size = DE, replace = F)
-    EE.sample <- sample(EEline.ind, size = EE, replace = F)
+    DE.sample <- sample(DEline.ind, size = DE, replace = FALSE)
+    EE.sample <- sample(EEline.ind, size = EE, replace = FALSE)
     sim.sample <- c(EE.sample, DE.sample)
     names(sim.sample) <- rownames(res$ori.res$newlm)[sim.sample]
     BetaMat <- coefbeta[sim.sample,]
@@ -91,14 +91,14 @@ TC_CAR1_sc <- function(RFIanalysis, scenario,  EE, DE,  C.matrix, Subject, Time,
     pv <- res$pqvalue$pv[,names(C.matrix)]
     qv <- res$pqvalue$qv[,names(C.matrix)]
     # sum(qline <= .05)
-    sortline <- sort(pv, index.return = T)
+    sortline <- sort(pv, index.return = TRUE)
     DEline.ind <- sortline$ix[1:(length(pv)/2)]
     EEline.ind <- setdiff(1:length(pv), DEline.ind)
     coefbeta <- res$ori.res$newlm[,grep("fixed.", names(res$ori.res$newlm))]
     colnames(coefbeta) <- gsub("fixed.", "", colnames(coefbeta))
     coefbeta[EEline.ind, colnames(C.matrix[[1]])]  <- 0
-    DE.sample <- sample(DEline.ind, size = DE, replace = F)
-    EE.sample <- sample(EEline.ind, size = EE, replace = F)
+    DE.sample <- sample(DEline.ind, size = DE, replace = FALSE)
+    EE.sample <- sample(EEline.ind, size = EE, replace = FALSE)
     sim.sample <- c(EE.sample, DE.sample)
     names(sim.sample) <- rownames(res$ori.res$v$E)[sim.sample]
     BetaMat <- coefbeta[sim.sample,]

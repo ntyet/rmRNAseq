@@ -1,5 +1,9 @@
 ## Resubmission
 This is a resubmission. In this version I have:
+* changed all T, F  to TRUE, FALSE, respectively
+
+## Resubmission
+This is a resubmission. In this version I have:
 * wrapped the (working) example of the function TC_CAR1_sc inside \donttest
   to avoid NOTE about elapsed time (> 10s)
 

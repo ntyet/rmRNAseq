@@ -5,7 +5,7 @@
 \title{A Wrap Function to analyze a Simulated Data - All Cases}
 \usage{
 TC_CAR1_sc(RFIanalysis, scenario, EE, DE, C.matrix, Subject, Time, Nboot,
-  nrep, ncores, name_dir_sim = NULL, print.progress = F,
+  nrep, ncores, name_dir_sim = NULL, print.progress = FALSE,
   saveboot = FALSE)
 }
 \arguments{
@@ -35,7 +35,7 @@ value of \code{ncores} is 1.}
 
 \item{print.progress}{\code{TRUE} or \code{FALSE}, printing the process or not.}
 
-\item{saveboot}{TRUE or FALSE to save or not save bootstrap output}
+\item{saveboot}{\code{TRUE} or \code{FALSE} to save or not save bootstrap output}
 }
 \value{
 R, V, FDR, PAUC, and AUC of all 7 methods (2 oracles with unshrunken and shrunken)
@@ -65,7 +65,7 @@ names(C.matrix) <- c("line2")
 scenario <- 1; EE <- 3; DE <- 2; ncores <- 1; Subject <- covset$ear;
 Time <- covset$time; Nboot <- 2; nrep <- 1;
 name_dir_sim <- NULL
-print.progress=FALSE; saveboot <- FALSE;
+print.progress <- FALSE; saveboot <- FALSE;
 TC_Symm_scOut <- rmRNAseq:::TC_CAR1_sc(RFIanalysis, scenario,  EE, DE,  C.matrix,
 Subject, Time,  Nboot,  nrep, ncores, name_dir_sim , print.progress, saveboot)
 names(TC_Symm_scOut)

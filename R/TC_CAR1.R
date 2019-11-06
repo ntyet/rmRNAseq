@@ -66,7 +66,7 @@ glsSymm <- function(d) {
   temp <- stats::vcov(glsout)
   temp <- Matrix::nearPD(temp)$mat
   rho <- unname(stats::coef(glsout$modelStruct$corStruct, unconstrained = FALSE))
-  varbetavec <- temp[lower.tri(temp, diag = T)]
+  varbetavec <- temp[lower.tri(temp, diag = TRUE)]
   return(c(aic = aic, bic = bic, s2 = s2, rho = rho, fixed = stats::coef(glsout), varbeta = varbetavec))
 }
 
@@ -175,15 +175,15 @@ sc_Symm <- function(BetaMat, Sigma2Vec, RhoVec, WeightMat, lib.size, design, Sub
   nTime <- length(uTime)
   sim.counts <- vapply(1:nrow(BetaMat), function(i) {
     Xbeta <- design %*% as.numeric(BetaMat[i, ])
-    block.matrix <- Sigma2Vec[i] * varbeta(RhoVec[i,], diag = F)
+    block.matrix <- Sigma2Vec[i] * varbeta(RhoVec[i,], diag = FALSE)
     block.matrix <- Matrix::nearPD(block.matrix)$mat  # library(Matrix)
-    block.matrix <- matrix(drop(block.matrix@x), nrow = nTime, byrow = T)
+    block.matrix <- matrix(drop(block.matrix@x), nrow = nTime, byrow = TRUE)
     V <- diag(sqrt(1/WeightMat[i, ])) %*% kronecker(diag(nSubject), block.matrix) %*%
       diag(sqrt(1/WeightMat[i, ]))
     cnt <- 1
     repeat {
       epsilon <- MASS::mvrnorm(n = 1, mu = rep(0, nrow(design)), Sigma = V)  # library(MASS)
-      out <- unname(round(2^(Xbeta + epsilon) * (lib.size + 1)/10^6)[, , drop = T])
+      out <- unname(round(2^(Xbeta + epsilon) * (lib.size + 1)/10^6)[, , drop = TRUE])
       if (mean(out)>1 & max(out) < 10^7)
         break
     }
@@ -363,7 +363,7 @@ glsCAR1 <- function(d) {
   fixed <- stats::coef(glsout)
   temp <- stats::vcov(glsout)
   temp <- Matrix::nearPD(temp)$mat
-  varbeta <- temp[lower.tri(temp, diag = T)]  # save vcov matrix by using only lower triangular including diagonal elements
+  varbeta <- temp[lower.tri(temp, diag = TRUE)]  # save vcov matrix by using only lower triangular including diagonal elements
   return(c(aic = aic, bic = bic, s2 = s2, rho = rho, fixed = stats::coef(glsout), varbeta = varbeta))
 }
 
@@ -377,7 +377,7 @@ glsCAR1 <- function(d) {
 #' @param v output of \code{\link[limma]{voom}} function.
 #' @param Subject a vector of subjects or experimental units.
 #' @param Time a vector of time points.
-#' @param print.progress logical indicator, T or F, to print the progress.
+#' @param print.progress logical indicator, TRUE or FALSE, to print the progress.
 #'
 #' @return a data frame has G rows (= number of genes) containing all outputs from
 #'   \code{\link{glsCAR1}} function, shrinkage estimates of error variances, and
@@ -583,7 +583,7 @@ NewTimeEst <- function(v, Subject, Time, TimeMinOut, ncores){
     -loglik
   }
   ui <- matrix(c(1, 0,
-                 0, -1), byrow = T, ncol = 2)
+                 0, -1), byrow = TRUE, ncol = 2)
   ci <- c(0,
           -1)
   o <- constrOptim(theta = c(.3, .51), f = xmap,grad = NULL,  ui = ui, ci = ci)
@@ -641,14 +641,14 @@ sc_CAR1 <- function(BetaMat, Sigma2Vec, RhoVec, WeightMat, lib.size, design, Sub
     Xbeta <- design %*% as.numeric(BetaMat[i, ])
     block.matrix <- Sigma2Vec[i] * RhoVec[i]^corematrix
     block.matrix <- Matrix::nearPD(block.matrix)$mat  # library(Matrix)
-    block.matrix <- matrix(drop(block.matrix@x), nrow = nTime, byrow = T)
+    block.matrix <- matrix(drop(block.matrix@x), nrow = nTime, byrow = TRUE)
     V <- diag(sqrt(1/WeightMat[i, ])) %*% kronecker(diag(nSubject), block.matrix) %*%
       diag(sqrt(1/WeightMat[i, ]))
     cnt <- 1
     repeat {
       #message(cnt, '\n')
       epsilon <- MASS::mvrnorm(n = 1, mu = rep(0, nrow(design)), Sigma = V)  # library(MASS)
-      # out <- unname(round(2^(Xbeta + epsilon) * (lib.size + 1)/10^6)[, , drop = T])
+      # out <- unname(round(2^(Xbeta + epsilon) * (lib.size + 1)/10^6)[, , drop = TRUE])
       out <- round(pmax(0,as.numeric(2^(Xbeta + epsilon) * (lib.size + 1)/10^6)))
       if (mean(out)>1 & max(out) < 10^7)
         break
@@ -710,11 +710,11 @@ sc_CAR1 <- function(BetaMat, Sigma2Vec, RhoVec, WeightMat, lib.size, design, Sub
 #' @export
 
 
-TC_CAR1 <- function(counts, design, Subject, Time, C.matrix, Nboot = 100, ncores = 1, print.progress = F, saveboot = FALSE) {
+TC_CAR1 <- function(counts, design, Subject, Time, C.matrix, Nboot = 100, ncores = 1, print.progress = FALSE, saveboot = FALSE) {
   # message("Analyzing data using voomgls \n")
 
   v <- myvoom(counts = counts, design = design, lib.size = apply(counts, 2, stats::quantile,
-                                                                 0.75), plot = F)
+                                                                 0.75), plot = FALSE)
   # Estimate new time point
   # message("Estimate new time point \n")
   tmOut <- TimeMin(v, Subject, Time, ncores)
@@ -751,7 +751,7 @@ TC_CAR1 <- function(counts, design, Subject, Time, C.matrix, Nboot = 100, ncores
                          lib.size = lib.size, design = design, Subject = Subject, Time = Time, nrep = nrep)
     # saveRDS(simcounts, file = paste0("simcounts_", nrep, ".rds"))
     v1 <- limma::voom(counts = simcounts, lib.size = apply(simcounts, 2, stats::quantile, 0.75),
-                      design = design, plot = F)
+                      design = design, plot = FALSE)
     bootnrep <- list(simcounts = simcounts, v1 = v1)
     bootlm <- voomgls_CAR1(v = v1, Subject = Subject, Time = Time, ncores = ncores, C.matrix = C.matrix,
                            beta0 = BetaMat, print.progress = print.progress)
@@ -774,7 +774,7 @@ TC_CAR1 <- function(counts, design, Subject, Time, C.matrix, Nboot = 100, ncores
   #   # message("all cores work fine! \n")
   # }
   # calculating pvalue for all gene and all test in C.matrix components
-  pvboot <- vapply(grep(pattern = "Ftest", names(newlm0), value = T), function(x) {
+  pvboot <- vapply(grep(pattern = "Ftest", names(newlm0), value = TRUE), function(x) {
     boot_test <- sapply(bootres, "[[", x)
     obs_test <- newlm0[, x]
     pv <- parallel::mclapply(1:length(obs_test), function(i) {

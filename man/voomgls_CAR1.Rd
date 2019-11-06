@@ -23,7 +23,7 @@ value of \code{ncores} is 1.}
 vector. The default option \code{beta0 = NULL} means that \code{beta0} is a
 vector of 0.}
 
-\item{print.progress}{logical indicator, T or F, to print the progress.}
+\item{print.progress}{logical indicator, TRUE or FALSE, to print the progress.}
 }
 \value{
 a data frame has G rows (= number of genes) containing all outputs from

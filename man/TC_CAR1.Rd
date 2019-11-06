@@ -5,7 +5,7 @@
 \title{RNA-seq Analysis for Repeated-measures Data}
 \usage{
 TC_CAR1(counts, design, Subject, Time, C.matrix, Nboot = 100,
-  ncores = 1, print.progress = F, saveboot = FALSE)
+  ncores = 1, print.progress = FALSE, saveboot = FALSE)
 }
 \arguments{
 \item{counts}{a matrix of RNA-seq counts.}
@@ -23,7 +23,7 @@ TC_CAR1(counts, design, Subject, Time, C.matrix, Nboot = 100,
 \item{ncores}{number of cores for embarrassingly parallel procedure. Default
 value of \code{ncores} is 1.}
 
-\item{print.progress}{logical indicator, T or F, to print the progress.}
+\item{print.progress}{logical indicator, TRUE or FALSE, to print the progress.}
 
 \item{saveboot}{TRUE or FALSE to save or not save bootstrap output}
 }
