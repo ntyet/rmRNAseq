@@ -1,5 +1,20 @@
 ## Resubmission
 This is a resubmission. In this version I have:
+* checked the Authors field in DESCRIPTION file. The comment from CRAN staff "The Author(s) field cuts off at 'leading to'."
+is a false positive. Please see the "Original content of DESCRIPTION file:"
+ in the automatically generated messsage after submission which shows the Authors field has no cut off at "leading to":
+
+> Authors@R: c(person("Yet", "Nguyen", email = "tienyettoan@gmail.com", role = c("aut", "cre")),
+>      person("Dan", "Nettleton",  role = "aut"),
+>      person(c("Charity", "Gordon"), c("Law", "Smyth"), role = "ctb",
+>      comment = "The authors of limma::voom, which was modified slightly leading to my_voom"),
+>      person("Agata", "Michna", role = "ctb",
+>      comment = "The author of splineTimeR::splineDiffExprs, which was modified slightly leading to my_splineDiffExprs")
+>      )
+
+
+## Resubmission
+This is a resubmission. In this version I have:
 * changed all T, F  to TRUE, FALSE, respectively
 
 ## Resubmission
