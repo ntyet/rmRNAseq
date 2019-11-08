@@ -1,9 +1,13 @@
 ## Resubmission
 This is a resubmission. In this version I have:
-* checked the Authors field in DESCRIPTION file. The comment from CRAN staff "The Author(s) field cuts off at 'leading to'."
-is a false positive. Please see the "Original content of DESCRIPTION file:"
- in the automatically generated messsage after submission which shows the Authors field has no cut off at "leading to":
+* checked the Authors field in DESCRIPTION file. It seems that the comment "the Authors field cut off at "leading to"" is a false positive because the "> Package Information:"  does not show full content of the DESCRIPTION file. Please see the paragraph "> Original content of DESCRIPTION file:" in the automatically generated CRAN message after the resubmission.
 
+> Original content of DESCRIPTION file:
+>
+> Package: rmRNAseq
+> Type: Package
+> Title: RNA-Seq Analysis for Repeated-Measures Data
+> Version: 0.1.0
 > Authors@R: c(person("Yet", "Nguyen", email = "tienyettoan@gmail.com", role = c("aut", "cre")),
 >      person("Dan", "Nettleton",  role = "aut"),
 >      person(c("Charity", "Gordon"), c("Law", "Smyth"), role = "ctb",
