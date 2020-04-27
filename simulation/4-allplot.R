@@ -1,4 +1,5 @@
 ###Sample Correlation plots-------
+library(rmRNAseq)
 library(plyr)
 library(tidyverse)
 library(limma)
@@ -28,71 +29,121 @@ ggsave("bioinformatics-rnaseq-repeated/figure/SampleCorreltion_AllGenes.pdf", wi
 ggsave("simulation/figure/SampleCorreltion_AllGenes.pdf", width = 6, height = 3)
 ggsave("simulation/figure/SampleCorreltion_AllGenes.eps", width = 6, height = 3)
 
-###Venn Diagrams-------
+
 RFIanalysis <- readRDS("simulation/DataAnalysis/RFIanalysis.rds")
 
+ImpulseDE2_time_qv <- rmRNAseq:::jabes.q(RFIanalysis$ImpulseDE2$time$dfImpulseDE2Results$p)
+ImpulseDE2_line_qv <- rmRNAseq:::jabes.q(RFIanalysis$ImpulseDE2$line$dfImpulseDE2Results$p)
+
 Line <- cbind(rmRNAseq = RFIanalysis$CAR1$pqvalue$qv$line2 <= .05,
-              voom = RFIanalysis$voom$line2$qv[,1] <= .05,
+              voomlimma = RFIanalysis$voom$line2$qv[,1] <= .05,
               edgeR = RFIanalysis$edgeR$line2$qv[,1] <= .05,
-              DESeq2 = RFIanalysis$DESeq2$line2$qv[,1] <= .05)
+              DESeq2 = RFIanalysis$DESeq2$line2$qv[,1] <= .05,
+              splineTimeR = RFIanalysis$splineTimeR$qv <=.05,
+              ImpulseDE2 = ImpulseDE2_line_qv <= .05)
 
 Time <- cbind(rmRNAseq = RFIanalysis$CAR1$pqvalue$qv$time <= .05,
-              voom = RFIanalysis$voom$time$qv[,1] <= .05,
+              voomlimma = RFIanalysis$voom$time$qv[,1] <= .05,
               edgeR = RFIanalysis$edgeR$time$qv[,1] <= .05,
-              DESeq2 = RFIanalysis$DESeq2$time$qv[,1] <= .05)
+              DESeq2 = RFIanalysis$DESeq2$time$qv[,1] <= .05,
+              ImpulseDE2 = ImpulseDE2_time_qv <= .05)
+
+###Bar Plot number of DEGs-------
+
+DEGs <- data.frame(DEGs = c(colSums(Line), colSums(Time)),
+                   Method = factor(c(colnames(Line), colnames(Time)),
+                                   levels = c("rmRNAseq", "voomlimma",
+                                              "edgeR", "DESeq2",
+                                              "splineTimeR", "ImpulseDE2")),
+                   Effect = c(rep("Line", ncol(Line)), rep("Time", ncol(Time))))
 
 
+ggplot(data = DEGs, mapping = aes(x = Method, y = DEGs)) +
+  geom_bar(stat = "identity")+
+  facet_wrap(~Effect, scale = "free")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(y = "Number of DE genes")
+theme(legend.position="none") #+
+#scale_y_log10()
 
-pdf("bioinformatics-rnaseq-repeated/VennDiagramRFI_Time024.pdf", width = 11, height = 4)
-par(mfrow = c(1, 2))
-vennDiagram(vennCounts(Line))
-title("Line", adj = .5, line = 2, cex.main=2)
-vennDiagram(vennCounts(Time))
-title("Time", adj = .5, line = 2, cex.main=2)
-dev.off()
+ggsave("bioinformatics-submitted-rv/BarDiagramRFI_Time024.pdf", width = 6, height = 3)
+ggsave("bioinformatics-submitted-rv/BarDiagramRFI_Time024.png", width = 6, height = 3)
+ggsave("bioinformatics-submitted-rv/BarDiagramRFI_Time024.eps", width = 6, height = 3)
 
+ggsave("bioinformatics-rnaseq-repeated/BarDiagramRFI_Time024.pdf", width = 6, height = 3)
+ggsave("bioinformatics-rnaseq-repeated/BarDiagramRFI_Time024.png", width = 6, height = 3)
+ggsave("bioinformatics-rnaseq-repeated/BarDiagramRFI_Time024.eps", width = 6, height = 3)
 
-postscript("bioinformatics-rnaseq-repeated/VennDiagramRFI_Time024.eps", width = 11, height = 4)
-par(mfrow = c(1, 2))
-vennDiagram(vennCounts(Line))
-title("Line", adj = .5, line = 2, cex.main=2)
-vennDiagram(vennCounts(Time))
-title("Time", adj = .5, line = 2, cex.main=2)
-dev.off()
-
-pdf("bioinformatics-rnaseq-repeated/figure/VennDiagramRFI_Time024.pdf", width = 11, height = 4)
-par(mfrow = c(1, 2))
-vennDiagram(vennCounts(Line))
-title("Line", adj = .5, line = 2, cex.main=2)
-vennDiagram(vennCounts(Time))
-title("Time", adj = .5, line = 2, cex.main=2)
-dev.off()
+ggsave("simulation/figure/BarDiagramRFI_Time024.pdf", width = 6, height = 3)
+ggsave("simulation/figure/BarDiagramRFI_Time024.png", width = 6, height = 3)
+ggsave("simulation/figure/BarDiagramRFI_Time024.eps", width = 6, height = 3)
 
 
-postscript("bioinformatics-rnaseq-repeated/figure/VennDiagramRFI_Time024.eps", width = 11, height = 4)
-par(mfrow = c(1, 2))
-vennDiagram(vennCounts(Line))
-title("Line", adj = .5, line = 2, cex.main=2)
-vennDiagram(vennCounts(Time))
-title("Time", adj = .5, line = 2, cex.main=2)
-dev.off()
+ggsave("bioinformatics-submitted-rv/BarDiagramRFI_Time024.pdf", width = 10, height = 7, units = "cm")
+ggsave("bioinformatics-submitted-rv/BarDiagramRFI_Time024.png", width = 10, height = 7, units = "cm")
+ggsave("bioinformatics-submitted-rv/BarDiagramRFI_Time024.eps", width = 10, height = 7, units = "cm")
 
-pdf("simulation/figure/VennDiagramRFI_Time024.pdf", width = 11, height = 4)
-par(mfrow = c(1, 2))
-vennDiagram(vennCounts(Line))
-title("Line", adj = .5, line = 2, cex.main=2)
-vennDiagram(vennCounts(Time))
-title("Time", adj = .5, line = 2, cex.main=2)
-dev.off()
+ggsave("bioinformatics-rnaseq-repeated/BarDiagramRFI_Time024.pdf", width = 10, height = 7, units = "cm")
+ggsave("bioinformatics-rnaseq-repeated/BarDiagramRFI_Time024.png", width = 10, height = 7, units = "cm")
+ggsave("bioinformatics-rnaseq-repeated/BarDiagramRFI_Time024.eps", width = 10, height = 7, units = "cm")
 
+ggsave("simulation/figure/BarDiagramRFI_Time024.pdf", width = 10, height = 7, units = "cm")
+ggsave("simulation/figure/BarDiagramRFI_Time024.png", width = 10, height = 7, units = "cm")
+ggsave("simulation/figure/BarDiagramRFI_Time024.eps", width = 10, height = 7, units = "cm")
 
-postscript("simulation/figure/VennDiagramRFI_Time024.eps", width = 11, height = 4)
-par(mfrow = c(1, 2))
-vennDiagram(vennCounts(Line))
-title("Line", adj = .5, line = 2, cex.main=2)
-vennDiagram(vennCounts(Time))
-title("Time", adj = .5, line = 2, cex.main=2)
-dev.off()
+###Venn Diagrams-------
+
+# pdf("bioinformatics-rnaseq-repeated/VennDiagramRFI_Time024.pdf", width = 11, height = 4)
+# par(mfrow = c(1, 2))
+# vennDiagram(vennCounts(Line))
+# title("Line", adj = .5, line = 2, cex.main=2)
+# vennDiagram(vennCounts(Time))
+# title("Time", adj = .5, line = 2, cex.main=2)
+# dev.off()
+#
+#
+# postscript("bioinformatics-rnaseq-repeated/VennDiagramRFI_Time024.eps", width = 11, height = 4)
+# par(mfrow = c(1, 2))
+# vennDiagram(vennCounts(Line))
+# title("Line", adj = .5, line = 2, cex.main=2)
+# vennDiagram(vennCounts(Time))
+# title("Time", adj = .5, line = 2, cex.main=2)
+# dev.off()
+#
+# pdf("bioinformatics-rnaseq-repeated/figure/VennDiagramRFI_Time024.pdf", width = 11, height = 4)
+# par(mfrow = c(1, 2))
+# vennDiagram(vennCounts(Line))
+# title("Line", adj = .5, line = 2, cex.main=2)
+# vennDiagram(vennCounts(Time))
+# title("Time", adj = .5, line = 2, cex.main=2)
+# dev.off()
+#
+#
+# postscript("bioinformatics-rnaseq-repeated/figure/VennDiagramRFI_Time024.eps", width = 11, height = 4)
+# par(mfrow = c(1, 2))
+# vennDiagram(vennCounts(Line))
+# title("Line", adj = .5, line = 2, cex.main=2)
+# vennDiagram(vennCounts(Time))
+# title("Time", adj = .5, line = 2, cex.main=2)
+# dev.off()
+#
+# pdf("simulation/figure/VennDiagramRFI_Time024.pdf", width = 11, height = 4)
+# par(mfrow = c(1, 2))
+# vennDiagram(vennCounts(Line))
+# title("Line", adj = .5, line = 2, cex.main=2)
+# vennDiagram(vennCounts(Time))
+# title("Time", adj = .5, line = 2, cex.main=2)
+# dev.off()
+#
+#
+# postscript("simulation/figure/VennDiagramRFI_Time024.eps", width = 11, height = 4)
+# par(mfrow = c(1, 2))
+# vennDiagram(vennCounts(Line))
+# title("Line", adj = .5, line = 2, cex.main=2)
+# vennDiagram(vennCounts(Time))
+# title("Time", adj = .5, line = 2, cex.main=2)
+# dev.off()
+
 
 
 
@@ -157,7 +208,7 @@ for(dp in dirpath[-1]){ # dp <- dirpath[5]
   NTP0$R <- R0$R - V0$V
   colnames(NTP0)[5] <- "S"
 
-FDR0 <- llply(fpr, function(x){
+  FDR0 <- llply(fpr, function(x){
     out3 <- out1%>%
       gather(key = "Method", value = "FDR",
              starts_with(paste0("FDR", x, collapse = "")) )%>%
@@ -195,38 +246,44 @@ d1$Method <- factor(d1$Method, levels = c("rmRNAseq",  "CAR1","Symm", "voomlimma
 # d1%>%dplyr::filter(FPR == ".05" & Effect == "Time" & Scenario == "corSymm")%>% dplyr::group_by(Method, FPR, Scenario, Effect)%>%dplyr::summarise(Ave = mean(NTP))
 
 p1 <- ggplot(data = subset(d1, #Method %in% c("rmRNAseq", "voom", "edgeR", "DESeq2")&
-                             (FPR == ".05")&
+                           (FPR == ".05")&
                              (Effect %in%  c("Line", "Time"))))+
   geom_boxplot(mapping = aes(y = FDR, x= Method))+
   facet_grid(Effect~Scenario, scale = "free")+
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   theme(legend.position="none")+
   geom_hline(aes(yintercept=.05))
 
+ggsave("bioinformatics-submitted-rv/FDR_SimPlot_Time024.pdf", width = 10, height = 10, units = "cm")
+ggsave("bioinformatics-submitted-rv/FDR_SimPlot_Time024.png", width = 10, height = 10, units = "cm")
+ggsave("bioinformatics-submitted-rv/FDR_SimPlot_Time024.eps", width = 10, height = 10, units = "cm")
+
 ggsave("bioinformatics-rnaseq-repeated/FDR_SimPlot_Time024.pdf", width = 10, height = 10, units = "cm")
-ggsave("bioinformatics-rnaseq-repeated/figure/FDR_SimPlot_Time024.pdf", width = 10, height = 10, units = "cm")
-
 ggsave("bioinformatics-rnaseq-repeated/FDR_SimPlot_Time024.png", width = 10, height = 10, units = "cm")
-ggsave("bioinformatics-rnaseq-repeated/figure/FDR_SimPlot_Time024.png", width = 10, height = 10, units = "cm")
+ggsave("bioinformatics-rnaseq-repeated/FDR_SimPlot_Time024.eps", width = 10, height = 10, units = "cm")
 
+ggsave("simulation/figure/FDR_SimPlot_Time024.pdf", width = 10, height = 10, units = "cm")
 ggsave("simulation/figure/FDR_SimPlot_Time024.png", width = 10, height = 10, units = "cm")
 ggsave("simulation/figure/FDR_SimPlot_Time024.eps", width = 10, height = 10, units = "cm")
 
+
 p2 <- ggplot(data = subset(d1, #Method %in% c("rmRNAseq", "voom", "edgeR", "DESeq2")&
-                             (FPR == ".05")&
+                           (FPR == ".05")&
                              (Effect  %in%  c("Line", "Time"))))+
   geom_boxplot(mapping = aes(y = PAUC, x= Method))+
   facet_grid(Effect~Scenario, scale = "free")+
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   theme(legend.position="none")
 
+ggsave("bioinformatics-submitted-rv/PAUC_SimPlot_Time024.pdf", width = 10, height = 10, units = "cm")
+ggsave("bioinformatics-submitted-rv/PAUC_SimPlot_Time024.png", width = 10, height = 10, units = "cm")
+ggsave("bioinformatics-submitted-rv/PAUC_SimPlot_Time024.eps", width = 10, height = 10, units = "cm")
+
 ggsave("bioinformatics-rnaseq-repeated/PAUC_SimPlot_Time024.pdf", width = 10, height = 10, units = "cm")
-ggsave("bioinformatics-rnaseq-repeated/figure/PAUC_SimPlot_Time024.pdf", width = 10, height = 10, units = "cm")
-
-
 ggsave("bioinformatics-rnaseq-repeated/PAUC_SimPlot_Time024.png", width = 10, height = 10, units = "cm")
-ggsave("bioinformatics-rnaseq-repeated/figure/PAUC_SimPlot_Time024.png", width = 10, height = 10, units = "cm")
+ggsave("bioinformatics-rnaseq-repeated/PAUC_SimPlot_Time024.eps", width = 10, height = 10, units = "cm")
 
+ggsave("simulation/figure/PAUC_SimPlot_Time024.pdf", width = 10, height = 10, units = "cm")
 ggsave("simulation/figure/PAUC_SimPlot_Time024.png", width = 10, height = 10, units = "cm")
 ggsave("simulation/figure/PAUC_SimPlot_Time024.eps", width = 10, height = 10, units = "cm")
 
@@ -236,15 +293,17 @@ p3 <- ggplot(data = subset(d1, #Method %in% c("rmRNAseq", "voom", "edgeR", "DESe
                              (Effect  %in%  c("Line", "Time"))))+
   geom_boxplot(mapping = aes(y = NTP, x= Method))+
   facet_grid(Effect~Scenario, scale = "free")+
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   theme(legend.position="none")
 
+ggsave("bioinformatics-submitted-rv/NTP_SimPlot_Time024.pdf", width = 10, height = 10, units = "cm")
+ggsave("bioinformatics-submitted-rv/NTP_SimPlot_Time024.png", width = 10, height = 10, units = "cm")
+ggsave("bioinformatics-submitted-rv/NTP_SimPlot_Time024.eps", width = 10, height = 10, units = "cm")
+
 ggsave("bioinformatics-rnaseq-repeated/NTP_SimPlot_Time024.pdf", width = 10, height = 10, units = "cm")
-ggsave("bioinformatics-rnaseq-repeated/figure/NTP_SimPlot_Time024.pdf", width = 10, height = 10, units = "cm")
-
 ggsave("bioinformatics-rnaseq-repeated/NTP_SimPlot_Time024.png", width = 10, height = 10, units = "cm")
-ggsave("bioinformatics-rnaseq-repeated/figure/NTP_SimPlot_Time024.png", width = 10, height = 10, units = "cm")
+ggsave("bioinformatics-rnaseq-repeated/NTP_SimPlot_Time024.eps", width = 10, height = 10, units = "cm")
 
+ggsave("simulation/figure/NTP_SimPlot_Time024.pdf", width = 10, height = 10, units = "cm")
 ggsave("simulation/figure/NTP_SimPlot_Time024.png", width = 10, height = 10, units = "cm")
 ggsave("simulation/figure/NTP_SimPlot_Time024.eps", width = 10, height = 10, units = "cm")
-
