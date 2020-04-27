@@ -3,7 +3,7 @@ library(plyr)
 library(tidyverse)
 library(limma)
 library(dplyr)
-RFIanalysis <- readRDS(file = paste0("simulation/DataAnalysis/RFIanalysis.rds"))
+RFIanalysis <- readRDS("simulation/DataAnalysis/RFIanalysis.rds")
 rho <- data.frame(rho1 = RFIanalysis$Symm$ori.res$newlm$rho1,
                   rho2 = RFIanalysis$Symm$ori.res$newlm$rho2,
                   rho3 = RFIanalysis$Symm$ori.res$newlm$rho3,
@@ -23,16 +23,20 @@ ggplot(data = rho2, mapping = aes( x = reorder(pairs, correlation, FUN = median)
   geom_boxplot()+
   xlab("Time Pair")+
   ylab("Estimated Correlation")
+
 ggsave("bioinformatics-rnaseq-repeated/SampleCorreltion_AllGenes.pdf", width = 6, height = 3)
-ggsave("bioinformatics-rnaseq-repeated/figure/SampleCorreltion_AllGenes.pdf", width = 6, height = 3)
+ggsave("bioinformatics-rnaseq-repeated/SampleCorreltion_AllGenes.eps", width = 6, height = 3)
 ggsave("simulation/figure/SampleCorreltion_AllGenes.pdf", width = 6, height = 3)
 ggsave("simulation/figure/SampleCorreltion_AllGenes.eps", width = 6, height = 3)
 
 
-RFIanalysis <- readRDS("simulation/DataAnalysis/RFIanalysis.rds")
+{ sink("/dev/null"); str(RFIanalysis$ImpulseDE2$time); sink(); }
 
-ImpulseDE2_time_qv <- rmRNAseq:::jabes.q(RFIanalysis$ImpulseDE2$time$dfImpulseDE2Results$p)
-ImpulseDE2_line_qv <- rmRNAseq:::jabes.q(RFIanalysis$ImpulseDE2$line$dfImpulseDE2Results$p)
+
+ImpulseDE2_time_pv <- RFIanalysis$ImpulseDE2$time$dfImpulseDE2Results$p
+ImpulseDE2_line_pv <- RFIanalysis$ImpulseDE2$line$dfImpulseDE2Results$p
+ImpulseDE2_time_qv <- rmRNAseq:::jabes.q(ImpulseDE2_time_pv)
+ImpulseDE2_line_qv <- rmRNAseq:::jabes.q(ImpulseDE2_line_pv)
 
 Line <- cbind(rmRNAseq = RFIanalysis$CAR1$pqvalue$qv$line2 <= .05,
               voomlimma = RFIanalysis$voom$line2$qv[,1] <= .05,
@@ -144,14 +148,6 @@ ggsave("simulation/figure/BarDiagramRFI_Time024.eps", width = 10, height = 7, un
 # dev.off()
 
 
-
-
-###identify DE genes-------
-
-rfidata <- readRDS("simulation/data/rfidata.rds")
-###DE genes wrt Line effect-------
-View(rownames(rfidata$counts[which(apply(Line, 1, mean)==1),]))
-head(rfidata$counts[which(apply(Line, 1, mean)==1),])
 
 ###Simulation Results-------
 
