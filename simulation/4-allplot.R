@@ -1,5 +1,4 @@
 ###Sample Correlation plots-------
-library(rmRNAseq)
 library(plyr)
 library(tidyverse)
 library(limma)
