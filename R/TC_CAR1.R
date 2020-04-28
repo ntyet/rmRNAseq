@@ -628,7 +628,7 @@ NewTimeEst <- function(v, Subject, Time, TimeMinOut, ncores){
 #'Subject <- covset$ear
 #'Time <- covset$time
 #'simcounts <- rmRNAseq:::sc_CAR1(BetaMat, Sigma2Vec, RhoVec, WeightMat,
-#'lib.size, design, Subject, Time)
+#'lib.size, design, Subject, Time, nrep)
 #'dim(simcounts)
 #'}
 

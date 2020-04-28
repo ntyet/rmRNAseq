@@ -57,7 +57,7 @@ nrep <- 1
 Subject <- covset$ear
 Time <- covset$time
 simcounts <- rmRNAseq:::sc_CAR1(BetaMat, Sigma2Vec, RhoVec, WeightMat,
-lib.size, design, Subject, Time)
+lib.size, design, Subject, Time, nrep)
 dim(simcounts)
 }
 }
