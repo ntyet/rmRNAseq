@@ -4,8 +4,17 @@
 \alias{sc_Symm}
 \title{Simulating Count Data From The Output of Real Data Analysis (corSymm)}
 \usage{
-sc_Symm(BetaMat, Sigma2Vec, RhoVec, WeightMat, lib.size, design, Subject,
-  Time, nrep)
+sc_Symm(
+  BetaMat,
+  Sigma2Vec,
+  RhoVec,
+  WeightMat,
+  lib.size,
+  design,
+  Subject,
+  Time,
+  nrep
+)
 }
 \arguments{
 \item{BetaMat}{a matrix of estimates of regression coefficients.}

@@ -4,6 +4,7 @@
 ^data-raw$
 ^simulation$
 ^bioinformatics-rnaseq-repeated-revised$
+^bioinformatics-submitted-rv$
 ^\.ReadMe\.Rmd
 ^\.ReadMe\.html
 ^cran-comments\.md$

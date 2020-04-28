@@ -4,9 +4,21 @@
 \alias{TC_CAR1_sc}
 \title{A Wrap Function to analyze a Simulated Data - All Cases}
 \usage{
-TC_CAR1_sc(RFIanalysis, scenario, EE, DE, C.matrix, Subject, Time, Nboot,
-  nrep, ncores, name_dir_sim = NULL, print.progress = FALSE,
-  saveboot = FALSE)
+TC_CAR1_sc(
+  RFIanalysis,
+  scenario,
+  EE,
+  DE,
+  C.matrix,
+  Subject,
+  Time,
+  Nboot,
+  nrep,
+  ncores,
+  name_dir_sim = NULL,
+  print.progress = FALSE,
+  saveboot = FALSE
+)
 }
 \arguments{
 \item{RFIanalysis}{the output from RFI RNA-seq dataset. In the ideal simulation case,

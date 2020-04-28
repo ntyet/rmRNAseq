@@ -4,7 +4,9 @@
 \name{resSymm}
 \alias{resSymm}
 \title{Data Containing results when analyzing RFI using TC_Symm}
-\format{An object of class \code{list} of length 2.}
+\format{
+An object of class \code{list} of length 2.
+}
 \usage{
 resSymm
 }

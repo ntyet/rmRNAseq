@@ -4,8 +4,15 @@
 \alias{voomgls_Symm}
 \title{General Linear Model Using Voom Output corSymm correlction structure}
 \usage{
-voomgls_Symm(v, Subject, Time, ncores = 1, C.matrix = NULL,
-  beta0 = NULL, print.progress = FALSE)
+voomgls_Symm(
+  v,
+  Subject,
+  Time,
+  ncores = 1,
+  C.matrix = NULL,
+  beta0 = NULL,
+  print.progress = FALSE
+)
 }
 \arguments{
 \item{v}{output of \code{\link[limma]{voom}} function.}

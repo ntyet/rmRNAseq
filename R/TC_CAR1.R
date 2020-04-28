@@ -560,7 +560,9 @@ glsCAR1_loglik <- function(d){
 #' Subject <- covset$ear
 #' Time <- covset$time
 #' ncores <- 1
-#' NewTimeOut <- rmRNAseq:::NewTimeEst(v, Subject, Time, ncores)
+#' tmOut <- TimeMin(v, Subject, Time, ncores)
+#' TimeMinOut <-tmOut$MinMaxTime
+#' NewTimeOut <- rmRNAseq:::NewTimeEst(v, Subject, Time, TimeMinOut, ncores)
 #' NewTimeOut
 #' }
 NewTimeEst <- function(v, Subject, Time, TimeMinOut, ncores){

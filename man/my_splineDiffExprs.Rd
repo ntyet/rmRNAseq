@@ -4,8 +4,14 @@
 \alias{my_splineDiffExprs}
 \title{Differential expression analysis based on natural cubic spline regression models for time-course data}
 \usage{
-my_splineDiffExprs(eSetObject, df, cutoff.adj.pVal = 1, reference,
-  intercept = TRUE, voom_method = FALSE)
+my_splineDiffExprs(
+  eSetObject,
+  df,
+  cutoff.adj.pVal = 1,
+  reference,
+  intercept = TRUE,
+  voom_method = FALSE
+)
 }
 \arguments{
 \item{eSetObject}{\code{ExpressionSet} object of class \code{ExpressionSet} containing log-ratios or log-values of expression for a series of microarrays}

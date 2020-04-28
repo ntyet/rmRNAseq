@@ -4,8 +4,17 @@
 \alias{sc_CAR1}
 \title{Simulating Count Data From The Output of Real Data Analysis}
 \usage{
-sc_CAR1(BetaMat, Sigma2Vec, RhoVec, WeightMat, lib.size, design, Subject,
-  Time, nrep)
+sc_CAR1(
+  BetaMat,
+  Sigma2Vec,
+  RhoVec,
+  WeightMat,
+  lib.size,
+  design,
+  Subject,
+  Time,
+  nrep
+)
 }
 \arguments{
 \item{BetaMat}{a matrix of estimates of regression coefficients.}

@@ -4,8 +4,15 @@
 \alias{voomgls_CAR1}
 \title{General Linear Model Using Voom Output}
 \usage{
-voomgls_CAR1(v, Subject, Time, ncores = 1, C.matrix, beta0 = NULL,
-  print.progress = FALSE)
+voomgls_CAR1(
+  v,
+  Subject,
+  Time,
+  ncores = 1,
+  C.matrix,
+  beta0 = NULL,
+  print.progress = FALSE
+)
 }
 \arguments{
 \item{v}{output of \code{\link[limma]{voom}} function.}

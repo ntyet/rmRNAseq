@@ -4,8 +4,17 @@
 \alias{TC_CAR1}
 \title{RNA-seq Analysis for Repeated-measures Data}
 \usage{
-TC_CAR1(counts, design, Subject, Time, C.matrix, Nboot = 100,
-  ncores = 1, print.progress = FALSE, saveboot = FALSE)
+TC_CAR1(
+  counts,
+  design,
+  Subject,
+  Time,
+  C.matrix,
+  Nboot = 100,
+  ncores = 1,
+  print.progress = FALSE,
+  saveboot = FALSE
+)
 }
 \arguments{
 \item{counts}{a matrix of RNA-seq counts.}

@@ -4,7 +4,8 @@
 \name{res}
 \alias{res}
 \title{Data Containing Results of Our Proposed Method Applying to RFI RNA-seq data}
-\format{A list with 3 components \describe{
+\format{
+A list with 3 components \describe{
 \item{ori.res}{a list consisting
  of 2 components: \code{v}, which is a voom output including several
  components; \code{newlm}, which is the output from \code{glsCAR1}}
@@ -12,7 +13,8 @@
  \code{qv}. \code{pv} is a data frame of pvalues for each test such as
  \code{line2
    time}; \code{qv} is a data frame of corresponding q-values of the above
- p-values, calculated using the method by Nettleton 2006.} }}
+ p-values, calculated using the method by Nettleton 2006.} }
+}
 \usage{
 res
 }

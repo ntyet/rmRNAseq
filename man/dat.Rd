@@ -4,9 +4,11 @@
 \name{dat}
 \alias{dat}
 \title{RFI RNA-seq Data}
-\format{The dataset has 11911 rows and 32 columns corresponding to 32 RNA-seq
+\format{
+The dataset has 11911 rows and 32 columns corresponding to 32 RNA-seq
   samples from 8 pigs, each pig has 4 RNA-seq samples measured repeatedly at
-  0, 2, 6, 24 hours after LPS treatments.}
+  0, 2, 6, 24 hours after LPS treatments.
+}
 \usage{
 dat
 }

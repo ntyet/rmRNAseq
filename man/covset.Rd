@@ -4,13 +4,15 @@
 \name{covset}
 \alias{covset}
 \title{Covariate Set Associated with RFI RNA-seq}
-\format{\code{covset} is a dataframe with 32 rows and 11 columns,
+\format{
+\code{covset} is a dataframe with 32 rows and 11 columns,
  correspinding to 32 RNA-seq sample from 8 pigs at 4 times. 11 columns
  include \describe{ \item{time}{a continuous vector of mapping time points}
  \item{timef}{a factor of original time points} \item{line}{a factor of
  original line of each pig} \item{ear}{ear id of each pig} \item{line2,
  time2, ...}{the columns corresponding to design matrix transformation such that
- each column is a corresponding test statistics.} }}
+ each column is a corresponding test statistics.} }
+}
 \usage{
 covset
 }

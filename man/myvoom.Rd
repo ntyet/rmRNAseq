@@ -4,9 +4,16 @@
 \alias{myvoom}
 \title{myvoom function}
 \usage{
-myvoom(counts, design = NULL, lib.size = NULL,
-  normalize.method = "none", span = 0.5, plot = FALSE,
-  save.plot = FALSE, ...)
+myvoom(
+  counts,
+  design = NULL,
+  lib.size = NULL,
+  normalize.method = "none",
+  span = 0.5,
+  plot = FALSE,
+  save.plot = FALSE,
+  ...
+)
 }
 \arguments{
 \item{counts}{a numeric \code{matrix} containing raw counts, or an \code{ExpressionSet} containing raw counts, or a \code{DGEList} object. Counts must be non-negative and NAs are not permitted.}
