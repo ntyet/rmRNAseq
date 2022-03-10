@@ -36,7 +36,7 @@ Imports:
     stats
 License: GPL (>=2)
 LazyData: true
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Suggests: knitr,
     rmarkdown,
     testthat

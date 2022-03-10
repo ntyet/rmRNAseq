@@ -13,7 +13,8 @@ TC_CAR1(
   Nboot = 100,
   ncores = 1,
   print.progress = FALSE,
-  saveboot = FALSE
+  saveboot = FALSE,
+  circadian = TRUE
 )
 }
 \arguments{
@@ -35,6 +36,8 @@ value of \code{ncores} is 1.}
 \item{print.progress}{logical indicator, TRUE or FALSE, to print the progress.}
 
 \item{saveboot}{TRUE or FALSE to save or not save bootstrap output}
+
+\item{circadian}{TRUE or FALSE to indicate if there is circadian rhythm}
 }
 \value{
 a list of 3 components \item{ori.res}{a list of 2 components
@@ -61,6 +64,7 @@ Nboot <- 2  # for real data analysis, use Nboot at least 100
 ncores <- 1 # for real data analysis and if the computer allows, increase ncores to save time
 print.progress <- FALSE
 saveboot <- FALSE
+circadian <- TRUE
 counts <- dat[1:3,]
 C.matrix <- list()
 # test for Line main effect
@@ -69,7 +73,7 @@ C.matrix[[1]] <- limma::makeContrasts(line2, levels = design)
 C.matrix[[2]] <- limma::makeContrasts(time2, time6, time24, levels = design)
 names(C.matrix) <- c("line2", "time")
 TCout <- rmRNAseq:::TC_CAR1(counts, design, Subject, Time, C.matrix,
-Nboot, ncores, print.progress, saveboot)
+Nboot, ncores, print.progress, saveboot, circadian)
 names(TCout)
 TCout$pqvalue$pv
 TCout$pqvalue$qv

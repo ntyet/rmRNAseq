@@ -16,25 +16,32 @@ myvoom(
 )
 }
 \arguments{
-\item{counts}{a numeric \code{matrix} containing raw counts, or an \code{ExpressionSet} containing raw counts, or a \code{DGEList} object. Counts must be non-negative and NAs are not permitted.}
+\item{counts}{
+    a numeric \code{matrix} containing raw counts, or an \code{ExpressionSet} containing raw counts, or a \code{DGEList} object.
+    Counts must be non-negative and NAs are not permitted.}
 
-\item{design}{design matrix with rows corresponding to samples and columns to coefficients to be estimated.  Defaults to the unit vector meaning that samples are treated as replicates.}
+\item{design}{
+    design matrix with rows corresponding to samples and columns to coefficients to be estimated.
+    Defaults to \code{model.matrix(~0+counts$samples$group)} if \code{counts} is a DGEList, otherwise defaults to the unit vector meaning that all samples are treated as replicates.}
 
-\item{lib.size}{numeric vector containing total library sizes for each sample.
- Defaults to the normalized (effective) library sizes in \code{counts} if \code{counts} is a \code{DGEList} or
- to the columnwise count totals if \code{counts} is a matrix.}
+\item{lib.size}{
+    numeric vector containing total library sizes for each sample.
+    Defaults to the normalized (effective) library sizes in \code{counts} if \code{counts} is a \code{DGEList} or to the columnwise count totals if \code{counts} is a matrix.}
 
-\item{normalize.method}{the microarray-style normalization method to be applied to the logCPM values (if any).
- Choices are as for the \code{method} argument of \code{normalizeBetweenArrays} when the data is single-channel.
- Any normalization factors found in \code{counts} will still be used even if \code{normalize.method="none"}.}
+\item{normalize.method}{
+    the microarray-style normalization method to be applied to the logCPM values (if any).
+    Choices are as for the \code{method} argument of \code{normalizeBetweenArrays} when the data is single-channel.
+    Any normalization factors found in \code{counts} will still be used even if \code{normalize.method="none"}.}
 
-\item{span}{width of the lowess smoothing window as a proportion.}
+\item{span}{
+    width of the smoothing window used for the lowess mean-variance trend.
+    Expressed as a proportion between 0 and 1.}
 
-\item{plot}{logical, should a plot of the mean-variance trend be displayed?}
+\item{plot}{
+    logical, should a plot of the mean-variance trend be displayed?}
 
-\item{save.plot}{logical, should the coordinates and line of the plot be saved in the output?}
-
-\item{...}{other arguments are passed to \code{lmFit}.}
+\item{save.plot}{
+    logical, should the coordinates and line of the plot be saved in the output?}
 }
 \value{
 the same output as \code{\link[limma]{voom}} plus the fitted function f

@@ -675,6 +675,7 @@ sc_CAR1 <- function(BetaMat, Sigma2Vec, RhoVec, WeightMat, lib.size, design, Sub
 #' @param C.matrix is a list of matrix Ci in testing H0:  Ci*beta = 0.
 #' @param Nboot number of bootstrap replicates, default is 100.
 #' @param saveboot TRUE or FALSE to save or not save bootstrap output
+#' @param circadian TRUE or FALSE to indicate if there is circadian rhythm
 #'
 #' @return a list of 3 components \item{ori.res}{a list of 2 components
 #'   \code{v}: voom's output, \code{newlm}: output from \code{\link{voomgls_CAR1}}.}
@@ -696,6 +697,7 @@ sc_CAR1 <- function(BetaMat, Sigma2Vec, RhoVec, WeightMat, lib.size, design, Sub
 #' ncores <- 1 # for real data analysis and if the computer allows, increase ncores to save time
 #' print.progress <- FALSE
 #' saveboot <- FALSE
+#' circadian <- TRUE
 #' counts <- dat[1:3,]
 #' C.matrix <- list()
 #' # test for Line main effect
@@ -704,7 +706,7 @@ sc_CAR1 <- function(BetaMat, Sigma2Vec, RhoVec, WeightMat, lib.size, design, Sub
 #' C.matrix[[2]] <- limma::makeContrasts(time2, time6, time24, levels = design)
 #' names(C.matrix) <- c("line2", "time")
 #' TCout <- rmRNAseq:::TC_CAR1(counts, design, Subject, Time, C.matrix,
-#' Nboot, ncores, print.progress, saveboot)
+#' Nboot, ncores, print.progress, saveboot, circadian)
 #' names(TCout)
 #' TCout$pqvalue$pv
 #' TCout$pqvalue$qv
@@ -712,14 +714,15 @@ sc_CAR1 <- function(BetaMat, Sigma2Vec, RhoVec, WeightMat, lib.size, design, Sub
 #' @export
 
 
-TC_CAR1 <- function(counts, design, Subject, Time, C.matrix, Nboot = 100, ncores = 1, print.progress = FALSE, saveboot = FALSE) {
+TC_CAR1 <- function(counts, design, Subject, Time, C.matrix, Nboot = 100, ncores = 1, print.progress = FALSE, saveboot = FALSE, circadian = TRUE) {
   # message("Analyzing data using voomgls \n")
 
   v <- myvoom(counts = counts, design = design, lib.size = apply(counts, 2, stats::quantile,
                                                                  0.75), plot = FALSE)
   # Estimate new time point
   # message("Estimate new time point \n")
-  tmOut <- TimeMin(v, Subject, Time, ncores)
+  if(circadian){
+    tmOut <- TimeMin(v, Subject, Time, ncores)
   TimeMinOut <-tmOut$MinMaxTime
   ntp <- NewTimeEst(v, Subject, Time, TimeMinOut, ncores)
   NewTime <- Time
@@ -728,7 +731,7 @@ TC_CAR1 <- function(counts, design, Subject, Time, C.matrix, Nboot = 100, ncores
   NewTime[Time==TimeMinOut[2]] <- 0
   NewTime[Time==TimeOther[1]] <- ntp[1]
   NewTime[Time==TimeOther[2]] <- ntp[2]
-  Time <- NewTime
+  Time <- NewTime}
   newlm0 <- voomgls_CAR1(v = v, Subject = Subject, Time = Time, ncores = ncores, C.matrix = C.matrix,
                          beta0 = NULL)
 
@@ -791,7 +794,7 @@ TC_CAR1 <- function(counts, design, Subject, Time, C.matrix, Nboot = 100, ncores
   names(pvboot) <- gsub("Ftest.", "", names(pvboot))
   qvboot <- data.frame(vapply(pvboot, function(x) jabes.q(x), FUN.VALUE = rep(1, nrow(counts))))
   pqvalue <- list(pv = pvboot, qv = qvboot)
-  if (saveboot){res <- list(NewTime = NewTime, TimeMinOut = tmOut,
+  if(circadian){if (saveboot){res <- list(NewTime = NewTime, TimeMinOut = tmOut,
                             ori.res = list(v = v, newlmSymm = newlm,
                                            newlm = newlm0),
                             boot.res = bootres,
@@ -802,6 +805,17 @@ TC_CAR1 <- function(counts, design, Subject, Time, C.matrix, Nboot = 100, ncores
                                           # boot.res = bootres,
                                           pqvalue = pqvalue)
                             }
+  }else{
+    if (saveboot){res <- list(ori.res = list(v = v, newlmSymm = newlm,
+                                             newlm = newlm0),
+                              boot.res = bootres,
+                              pqvalue = pqvalue)}else{
+                                res <- list(ori.res = list(v = v, newlmSymm = newlm,
+                                                           newlm = newlm0),
+                                            # boot.res = bootres,
+                                            pqvalue = pqvalue)
+                              }
+  }
   # message("# p.05 of each test \n")
   # print(apply(pqvalue$pv <= 0.05, 2, sum))
   # message("\n # q.05 of each test \n")
