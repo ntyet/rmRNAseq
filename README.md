@@ -19,18 +19,13 @@ general hypothesis testings.
 
 ## Installation
 
-You can install the released version of rmRNAseq from
-[CRAN](https://CRAN.R-project.org) with:
+<!-- You can install the released version of rmRNAseq from [CRAN](https://CRAN.R-project.org) with: -->
+<!-- ``` r -->
+<!-- install.packages("rmRNAseq") -->
+<!-- ``` -->
+<!-- (The package has just been submitted to [CRAN](https://CRAN.R-project.org) on June 26, 2019; it usually takes about 10 days to receive their feedback.) -->
 
-``` r
-install.packages("rmRNAseq")
-```
-
-(The package has just been submitted to
-[CRAN](https://CRAN.R-project.org) on June 26, 2019; it usually takes
-about 10 days to receive their feedback.)
-
-And the development version from [GitHub](https://github.com/) with:
+The package can be installed from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -52,6 +47,7 @@ Nboot <- 2  # for real data analysis, use Nboot at least 100
 ncores <- 1 # for real data analysis and if the computer allows, increase ncores to save time
 print.progress <- FALSE
 saveboot <- FALSE
+circadian <- TRUE  #  FALSE if the experiment does not show circadian rhythm effect
 counts <- dat[1:3,]
 C.matrix <- list()
 # test for Line main effect
@@ -60,10 +56,10 @@ C.matrix[[1]] <- limma::makeContrasts(line2, levels = design)
 C.matrix[[2]] <- limma::makeContrasts(time2, time6, time24, levels = design)
 names(C.matrix) <- c("line2", "time")
 TCout <- rmRNAseq:::TC_CAR1(counts, design, Subject, Time, C.matrix,
-Nboot, ncores, print.progress, saveboot)
-#> running bootstrap sample nrep =  1 
+Nboot, ncores, print.progress, saveboot, circadian)
+#> running bootstrap sample nrep = 1
 #> ---------------------------------------------
-#> running bootstrap sample nrep =  2 
+#> running bootstrap sample nrep = 2
 #> ---------------------------------------------
 names(TCout)
 #> [1] "NewTime"    "TimeMinOut" "ori.res"    "pqvalue"
