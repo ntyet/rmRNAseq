@@ -37,7 +37,7 @@ data(res)
 data(design)
 data(covset)
 d <- data.frame(cbind(y = res$ori.res$v$E[1,] ,Subject = covset$ear,
-Time = covset$time, w = 1/res$ori.res$v$weights[1,], design))
+Time = as.integer(as.factor(covset$time)), w = 1/res$ori.res$v$weights[1,], design))
 glsout <- rmRNAseq:::glsSymm(d)
 glsout
 }

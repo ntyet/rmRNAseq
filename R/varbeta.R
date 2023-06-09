@@ -9,7 +9,7 @@
 #'   elements of the symmetric matrix.
 #' @param diag a logical indicator, \code{TRUE} or \code{FALSE}, indicating if
 #'   \code{lower.tri.vector} contains diagonal elements of the symmetric matrix or not.
-#' @return The function \code{varbeta} returns the original symmetric matrix. We
+#' @return The function \code{corr_matrix} returns the original symmetric matrix. We
 #'   only use \code{diag = FALSE} to recover the correlation matrix, because
 #'   diagonal elements of a correlation matrix are all 1, so there is no reason
 #'   to store these diagonal elements in this case.
@@ -20,16 +20,16 @@
 #' \donttest{
 #' set.seed(1)
 #' lower.tri.vector <- runif(10)
-#' varout <- rmRNAseq:::varbeta(lower.tri.vector, diag=TRUE)
+#' varout <- rmRNAseq:::corr_matrix(lower.tri.vector, diag=TRUE)
 #' varout
 #' }
-varbeta <- function(lower.tri.vector, diag = TRUE) {
+corr_matrix <- function(lower.tri.vector, diag = TRUE) {
   n <- length(lower.tri.vector)
   if (diag) {
     p <- round((-1 + sqrt(1 + 8 * n))/2)
     X <- diag(p)
     X[lower.tri(X, diag = TRUE)] <- lower.tri.vector
-  } else {
+  } else { # correlation matrix i.e. diag elements = 1
     p <- round((1 + sqrt(1 + 8 * n))/2)
     X <- diag(p)
     X[lower.tri(X, diag = FALSE)] <- lower.tri.vector

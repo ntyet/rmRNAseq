@@ -35,7 +35,7 @@ teststat <- function(C.matrix, beta0=NULL, regression.output, ncores = 1) {
   s2_shrunken <- regression.output$s2_shrunken
   s2 <- regression.output$s2
   Ftestout <- parallel::mclapply(1:nrow(regression.output), function(i) {
-    m_varb <- varbeta(lower.tri.vector[i, ]) * s2_shrunken[i]/s2[i]
+    m_varb <- corr_matrix(lower.tri.vector[i, ]) * s2_shrunken[i]/s2[i]
     Fstat <- vapply(C.matrix, function(Cm) as.numeric(crossprod(crossprod(Cm, beta.coef[i,] - beta0[i, ]),
                                                       chol2inv(chol(Matrix::nearPD(crossprod(Cm, m_varb) %*% Cm)$mat))) %*%
                                               crossprod(Cm,beta.coef[i, ] - beta0[i, ])), FUN.VALUE = 1)

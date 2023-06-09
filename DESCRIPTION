@@ -12,7 +12,7 @@ Authors@R: c(person("Yet", "Nguyen", email = "tienyettoan@gmail.com", role = c("
 Description: A differential expression analysis method for RNA-seq data from repeated-measures design 
     using general linear model framework and parametric bootstrap inference. The method accounts for 
     the dependence of gene expression levels due to the repeated-measures through continuous autoregressive 
-    correlation structure. The method is described in Chapter 4 of 
+    correlation structure. The method is described in  Chapter 4 of 
     Nguyen (2018) <https://lib.dr.iastate.edu/cgi/viewcontent.cgi?article=7433&context=etd>.  
 Depends: R (>= 3.3)
 biocViews:
@@ -36,7 +36,7 @@ Imports:
     stats
 License: GPL (>=2)
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Suggests: knitr,
     rmarkdown,
     testthat

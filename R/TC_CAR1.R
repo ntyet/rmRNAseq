@@ -27,7 +27,7 @@
 #'data(design)
 #'data(covset)
 #'d <- data.frame(cbind(y = res$ori.res$v$E[1,] ,Subject = covset$ear,
-#'Time = covset$time, w = 1/res$ori.res$v$weights[1,], design))
+#'Time = as.integer(as.factor(covset$time)), w = 1/res$ori.res$v$weights[1,], design))
 #'glsout <- rmRNAseq:::glsSymm(d)
 #'glsout
 
@@ -42,13 +42,13 @@ glsSymm <- function(d) {
       stop("Too many loops, cnt >100")
     }
     glsout <- tryCatch(nlme::gls(stats::as.formula(paste0("y~0+", paste0(colnames(d)[-c(1:4)],
-                                                                         collapse = "+"))), data = d, weights = nlme::varFixed(~w), correlation = nlme::corSymm(form = ~1 |
+                                                                         collapse = "+"))), data = d, weights = nlme::varFixed(~w), correlation = nlme::corSymm(form = ~ Time |
                                                                                                                                                                   Subject), method = "REML", verbose = FALSE, control = nlme::glsControl(maxIter = 1e+07,
                                                                                                                                                                                                                                          msMaxIter = 1e+07, opt = "nlminb", tolerance = 1e-04)), error = function(e) NULL)
 
     if (is.null(glsout))
       glsout <- tryCatch(nlme::gls(stats::as.formula(paste0("y~0+", paste0(colnames(d)[-c(1:4)],
-                                                                           collapse = "+"))), data = d, weights = nlme::varFixed(~w), correlation = nlme::corSymm(form = ~1 |
+                                                                           collapse = "+"))), data = d, weights = nlme::varFixed(~w), correlation = nlme::corSymm(form = ~ Time |
                                                                                                                                                                     Subject), method = "REML", verbose = FALSE, control = nlme::glsControl(maxIter = 1e+07,
                                                                                                                                                                                                                                            msMaxIter = 1e+07, tolerance = 1e-04, opt = "optim")), error = function(e) NULL)
 
@@ -58,9 +58,9 @@ glsSymm <- function(d) {
       d$y <- d1$y + pmax(-0.1, pmin(stats::rnorm(nrow(d), 0, 0.1), 0.1))
     }
   }
-  aic <- stats::AIC(glsout) - 2*(ncol(d)-4)
-  ss <- length(unique(d$Time))*(length(unique(d$Time))-1)/2 +1
-  bic <- stats::AIC(glsout) - 2*(ncol(d)-4 + ss) + ss*log(nrow(d) - ncol(d)+4)
+  aic <- stats::AIC(glsout) - 2*(ncol(d)-4) # 4 is the first 4 columns y, Subject, Time, w that are not in design matrix
+  ss <- length(unique(d$Time))*(length(unique(d$Time))-1)/2 +1 # number of within-group variance-covariance parameters
+  bic <- stats::AIC(glsout) - 2*(ncol(d)-4 + ss) + ss*log(nrow(d) - ncol(d)+4) #
   s2 <- glsout$sigma^2
   fixed <- stats::coef(glsout)
   temp <- stats::vcov(glsout)
@@ -107,14 +107,14 @@ voomgls_Symm <- function(v, Subject, Time, ncores=1, C.matrix = NULL, beta0=NULL
   vout <- if(print.progress){
     parallel::mclapply(1:nrow(v), function(i) {
       # print(i)
-      d <- data.frame(cbind(y = v$E[i, ], Subject = Subject, Time = Time, w = 1/W[i,
+      d <- data.frame(cbind(y = v$E[i, ], Subject = Subject, Time = as.integer(as.factor(Time)), w = 1/W[i,
                                                                                   ], design))
       message('\n Analyzing gene = ', i, '\n')
       glsSymm(d)
     }, mc.cores = ncores)
   }else{
     parallel::mclapply(1:nrow(v), function(i) {
-      d <- data.frame(cbind(y = v$E[i, ], Subject = Subject, Time = Time, w = 1/W[i,
+      d <- data.frame(cbind(y = v$E[i, ], Subject = Subject, Time = as.integer(as.factor(Time)), w = 1/W[i,
                                                                                   ], design))
       glsSymm(d)
     }, mc.cores = ncores)
@@ -170,16 +170,28 @@ voomgls_Symm <- function(v, Subject, Time, ncores=1, C.matrix = NULL, beta0=NULL
 
 sc_Symm <- function(BetaMat, Sigma2Vec, RhoVec, WeightMat, lib.size, design, Subject, Time, nrep) {
   set.seed(10^9 + nrep)
+  Time <- as.integer(as.factor(Time))
+  n <- length(Time)
   nSubject <- length(unique(Subject))
   uTime <- unique(Time)
   nTime <- length(uTime)
+  # Time <- as.integer(as.factor(Time))
   sim.counts <- vapply(1:nrow(BetaMat), function(i) {
     Xbeta <- design %*% as.numeric(BetaMat[i, ])
-    block.matrix <- Sigma2Vec[i] * varbeta(RhoVec[i,], diag = FALSE)
-    block.matrix <- Matrix::nearPD(block.matrix)$mat  # library(Matrix)
-    block.matrix <- matrix(drop(block.matrix@x), nrow = nTime, byrow = TRUE)
-    V <- diag(sqrt(1/WeightMat[i, ])) %*% kronecker(diag(nSubject), block.matrix) %*%
-      diag(sqrt(1/WeightMat[i, ]))
+    # block.matrix <- Sigma2Vec[i] * corr_matrix(RhoVec[i,], diag = FALSE)
+    # block.matrix <- Matrix::nearPD(block.matrix)$mat  # library(Matrix)
+    # block.matrix <- matrix(drop(block.matrix@x), nrow = nTime, byrow = TRUE)
+    # V <- diag(sqrt(1/WeightMat[i, ])) %*% kronecker(diag(nSubject), block.matrix) %*%
+    #   diag(sqrt(1/WeightMat[i, ]))
+    corr.matrix <- corr_matrix(RhoVec[i,], diag = FALSE)
+    corr.matrix <- Matrix::nearPD(corr.matrix)$mat  # library(Matrix)
+    corr.matrix <- matrix(drop(corr.matrix@x), nrow = nTime, byrow = TRUE)
+    block.matrix <- matrix(0, nrow = n, ncol = n)
+    for(i1 in 1:n){
+      for(j1 in 1:n)
+        if(Subject[i1] == Subject[j1]) block.matrix[i1,j1] <-corr.matrix[Time[i1], Time[j1]]
+    }
+    V <- Sigma2Vec[i]*diag(sqrt(1/WeightMat[i, ])) %*%block.matrix%*%diag(sqrt(1/WeightMat[i, ]))
     cnt <- 1
     repeat {
       epsilon <- MASS::mvrnorm(n = 1, mu = rep(0, nrow(design)), Sigma = V)  # library(MASS)
@@ -469,11 +481,14 @@ TimeMin <- function(v, Subject, Time, ncores){
   voomglsout_Symm <- voomgls_Symm(v, Subject, Time, ncores, C.matrix = NULL, beta0= NULL, print.progress = FALSE)
   RhoVec <- data.matrix(voomglsout_Symm[grep("rho", names(voomglsout_Symm))])
   uTime <- unique(Time)
-  uTimePair <- combn(uTime, 2, simplify = FALSE)
-  # uTimePairMat <- do.call("rbind", uTimePair)
-  # colnames(RhoVec) <- paste(uTimePairMat[,1], uTimePairMat[,2], sep = ", ")
+  rank_uTime <- rank(uTime)
+  # uTimePair <- combn(uTime, 2, simplify = FALSE)
+  uTimePair <- combn(1:length(uTime), 2, simplify = FALSE) # corSymm index correlation parameter by consecutive integers from 1 to length(uTime)
   out <- apply(RhoVec, 2, median)
-  outall <- list(MinMaxTime = uTimePair[[which.min(out)]], medianout = out, voomglsout_Symm = voomglsout_Symm)
+  MinMaxTime <- uTime[rank_uTime%in%uTimePair[[which.min(out)]]]
+  # MinMaxTime <- c(min(MinMaxTimev), max(MinMaxTimev))
+
+  outall <- list(MinMaxTime = MinMaxTime, medianout = out, voomglsout_Symm = voomglsout_Symm)
   outall
 }
 
